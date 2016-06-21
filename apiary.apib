@@ -35,7 +35,7 @@ Create a new game for two players
     + creator_id (required, number) - unique ID for player creating the game
     + rival_id (required, number) - unique ID for opponent player to challenge
 
-### Start a new game [GET]
+### Start a new game [GET,POST]
 + Response 200 (application/json)
     { 
         "game_id": '42',
@@ -54,7 +54,7 @@ Get the current hand for a specified player and game
 
 + Parameters
     + game_id (required, number) - unique ID for the game
-    + player_id (required, number) - Your player ID
+    + player_id (required, number) - player ID requesting 
      
 + Response 200 (application/json)
     { 
@@ -79,6 +79,8 @@ Choose a card value to play
 This choice can be freely changed until both playeres have chosen their card for this round
 
 Choosing to play the Ace of Spades will discard any card value while *also* discarding the opponent's card(s)
+
+
 
 + Parameters
     + game_id (required, number) - unique ID for the game
