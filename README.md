@@ -2,10 +2,12 @@
 
 A card-game knife-fight with two players and one winner
 
-> “Shall there be truth between us, as two men? Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
+> “Shall there be truth between us? 
+> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
 
 
 ## Build instructions
+1. Install the google-python sdk with `sudo pip install appengine`
 1.  Create a new application in [app-engine](https://console.cloud.google.com)
 1.  Set `application` in app.yaml to the app ID you have registered
 1.  Run the app with the devserver using dev_appserver.py DIR, and ensure it's
@@ -15,5 +17,5 @@ A card-game knife-fight with two players and one winner
  
 
 ## How to Play
-TODO addme
+Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/) using your preferred client
 
