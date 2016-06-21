@@ -1,25 +1,34 @@
 FORMAT:alpha-1
-HOST: TODO
+HOST: https://aceofblades-bschmoker.c9users.io
 
 # Ace of Blades
 Take a regular deck and remove all face cards, leave only the ace of spades and numbered cards (37 total)
-- 2 player, each starts with 5 cards
-- first player to discard entire hand wins
+
+Start each player with starts with 5 cards from a shuffled deck
+
+> The first player to discard their entire hand wins
  
 ## Starting a New Game [/new]
+
+Create a new game for two players
 
 + Parameters
     + creator_id (required, number) - unique ID for player creating the game
     + rival_id (required, number) - unique ID for opponent player to challenge
 
 ### Start a new game [GET]
++ Response 200 (application/json)
+    { 
+        "game_id": '42',
+        "player_id" : '31337',
+        "hand" : [ {value: '2', suit:'diamonds']
 
 ## Playing the Game [/play]
 
 Make a move or check the current game state
 
 ### Get the current game state [GET]
-Get information about the current game, including your current hand
+Get information about a given game (including their current hand) for a player
 
 + Parameters
     + game_id (required, number) - unique ID for the game
@@ -27,11 +36,11 @@ Get information about the current game, including your current hand
      
 + Response 200 (application/json)
     { 
-        "game_id": '42'
-        "creator_id": '31337'
-        "rival_id": '8888'
-        "status": "active"
-        "player_id" : '31337'
+        "game_id": '42',
+        "creator_id": '31337',
+        "rival_id": '8888',
+        "status": "active",
+        "player_id" : '31337',
         "hand" : [ {value: '2', suit:'diamonds']
         
     }  
@@ -50,8 +59,8 @@ Choose a card value to play. Until your opponent chooses their card for this rou
 + Request (application/json)
     {
 
-        "game_id": '42'
-        "player_id": '31337'
+        "game_id": '42',
+        "player_id": '31337',
         "card": '7'
     }
 
