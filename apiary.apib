@@ -6,6 +6,25 @@ Take a regular deck and remove all face cards, leave only the ace of spades and 
 
 Start each player with starts with 5 cards from a shuffled deck
 
+## The Choice
+Each round, players choose a card value to play
+
+> Multiple cards of different suits and identical value are treated as one card with no advantage or disadvantage to playing them
+
+## The Showdown
+
+Card values are compared and judged:
+- Discard all cards of the lowest value
+- If all cards are the same value, they are all discarded
+- If the Ace of Spades was played, all cards are discarded
+
+If either player has the Ace of Spades, they may play it and choose any card value to discard
+
+> After playing the Ace, it transfers to the opposing player
+
+## The Aftermath
+After the showdown, both players draw a card from the shuffled deck
+
 > Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
 ## Starting a New Game [/new]
@@ -27,8 +46,8 @@ Create a new game for two players
 
 Make a move or check the current game state
 
-### Get the current game state [GET]
-Get information about a given game (including their current hand) for a player
+### Show your Hand [GET]
+Get the current hand for a specified player and game
 
 + Parameters
     + game_id (required, number) - unique ID for the game
@@ -53,19 +72,9 @@ player_id was invalid for the provided game_
 
 ### Play a Card [POST]
 Choose a card value to play. 
-Until your opponent chooses their card for this round, you may update the card you wish to play
-
-After the round is resolved, both players draw a card from the shuffled deck
-
-Once the deck is empty, the player with the fewest cards wins.
-
-If your card is *lower* than our opponents, your card is discarded and theirs returns to their hand.
-
-If both cards are the same value, both are discarded
+Until your opponent chooses their card for this round, you may update your choice
 
 Playing the Ace of Spades lets you discard any card while *also* discarding your opponent's card
-
-After playing the Ace, it moves to your opponent's hand
 
 + Parameters
     + game_id (required, number) - unique ID for the game
