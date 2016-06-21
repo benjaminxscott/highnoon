@@ -1,18 +1,12 @@
-- implement api endpoints
-- document:
-  - /ace?cardval
-    - checks if you have the ace, and sets it as your next move with `cardval` guaranteed to be discarded
-  - /round
-    (atomic)
-    - if /ace has been played , discard both `cardval` from players hands and move ace to other player's hand
+- implement mock api endpoints
+- implement backend process:
+    - if ace, discard both `cardval` from players hands and move ace to other player's hand
     - check each player's chosen `cardval` and discard the lowest from that player hand
     - internal call to discard() which removes any `cardval` (i.e. 2d and 2s) from hand 
     - if either hand is empty, game is over
     - each player draws a card from shuffled deck
     - return cards played and results
-  - /last
-    - show the cards played in the last round for each player
     
-- test using `curl`
+- test using [apiary client](https://jsapi.apiary.io/previews/aceofblades/reference)
  
-- (stretch)  with slack, display the ace of spades emoji and stacked list of hand
+- (later) implement using [slack buttons](https://slackhq.com/get-more-done-with-message-buttons-5fa5b283a59)
