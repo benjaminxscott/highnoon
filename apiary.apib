@@ -1,65 +1,113 @@
 FORMAT:alpha-1
-HOST: TODO
+HOST: https://aceofblades-bschmoker.c9users.io
 
 # Ace of Blades
 Take a regular deck and remove all face cards, leave only the ace of spades and numbered cards (37 total)
-- 2 player, each starts with 5 cards
-- first player to discard entire hand wins
+
+Start each player with starts with 5 cards from a shuffled deck
+
+## The Choice
+Each round, players choose a card value to play
+
+> Multiple cards of different suits and identical value are treated as one card with no advantage or disadvantage to playing them
+
+## The Showdown
+
+Card values are compared and judged:
+- Discard all cards of the lowest value
+- If all cards are the same value, they are all discarded
+- If the Ace of Spades was played, all cards are discarded
+
+If either player has the Ace of Spades, they may play it and choose any card value to discard
+
+> After playing the Ace, it transfers to the opposing player
+
+## The Aftermath
+After the showdown, both players draw a card from the shuffled deck
+
+> Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
-## Starting a New Game [/new]
+## Starting a New Game [/new/{player_id}{?rival_id}]
+
+Create a new game for two players
 
 + Parameters
-    + creator_id (required, number) - unique ID for player creating the game
-    + rival_id (required, number) - unique ID for opponent player to challenge
+    + player_id (required, number) - unique ID for player creating the game
+    + rival_id (optional, number) - unique ID for opponent player to challenge
 
 ### Start a new game [GET]
++ Response 200 (application/json)
 
-## Playing the Game [/play]
+        { 
+            "game_id": '42',
+            "player_id" : '31337',
+             "hand" : {
+                "player_id" : '31337' 
+                "cards": [ {value: '2', suit:'diamonds'}]
+        }
+
+## Playing the Game [/play/{game_id}{?player_id,card,ace}]
 
 Make a move or check the current game state
 
-### Get the current game state [GET]
-Get information about the current game, including your current hand
+### Show your Hand [GET]
+Get the current hand for a specified player and game
 
 + Parameters
     + game_id (required, number) - unique ID for the game
-    + player_id (required, number) - Your player ID
+    + player_id (required, number) - player ID requesting 
      
 + Response 200 (application/json)
-    { 
-        "game_id": '42'
-        "creator_id": '31337'
-        "rival_id": '8888'
-        "status": "active"
-        "player_id" : '31337'
-        "hand" : [ {value: '2', suit:'diamonds']
-        
-    }  
+
+        { 
+            "game_id": '42',
+            "hand" : {
+                "player_id" : '31337' 
+                "cards": [ {value: '2', suit:'diamonds'}]
+                }
+            
+        }  
     
-+ Response 401 
-player_id was invalid for the provided game_
++ Response 401 (text/plain)
+
+        player_id was invalid for the provided game
+        
++ Response 402 (text/plain)
+
+        This game has ended
 
 ### Play a Card [POST]
-Choose a card value to play. Until your opponent chooses their card for this round, you may update the card you wish to play
+Choose a card value to play from your hand
+
+> This choice can be freely changed until both players have chosen their card for this round
+
+Choosing to play the Ace of Spades will discard any card value while *also* discarding the opponent's card(s)
+
 
 + Parameters
     + game_id (required, number) - unique ID for the game
     + player_id (required, number) - your unique player ID
-    + card (required, number) - the card value you wish to play (suits are ignored)
-     
+    + card (required, number) - the card value you wish to play
+    + ace (optional, boolean) - whether you want to play the ace of spades
+    
 + Request (application/json)
-    {
 
-        "game_id": '42'
-        "player_id": '31337'
-        "card": '7'
-    }
+        {
+        
+            "game_id": '42',
+            "player_id": '31337',
+            "card": '7',
+            "ace": 'True'
+        }
 
 + Response 200 (application/json)
-Once both players have chosen a card value, the server will resolve the round and update each player's hand
 
-+ Response 401 
-player_id was invalid for the provided game_
+        Once both players have chosen a card value, the server resolves the showdown and updates each player's hand
 
-+ Response 403 
-player_id did not have access to the provided card value
++ Response 401 (text/plain)
+
+        player_id was invalid for the provided game_
+
++ Response 403 (text/plain)
+
+        player_id does not have the selected card
