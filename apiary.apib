@@ -6,7 +6,7 @@ Take a regular deck and remove all face cards, leave only the ace of spades and 
 
 Start each player with starts with 5 cards from a shuffled deck
 
-> The first player to discard their entire hand wins
+> Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
 ## Starting a New Game [/new]
 
@@ -40,8 +40,11 @@ Get information about a given game (including their current hand) for a player
         "creator_id": '31337',
         "rival_id": '8888',
         "status": "active",
-        "player_id" : '31337',
-        "hand" : [ {value: '2', suit:'diamonds']
+        
+        "hand" : {
+            "player_id" : '31337' 
+            "cards": [ {value: '2', suit:'diamonds'}]
+            }
         
     }  
     
@@ -49,13 +52,27 @@ Get information about a given game (including their current hand) for a player
 player_id was invalid for the provided game_
 
 ### Play a Card [POST]
-Choose a card value to play. Until your opponent chooses their card for this round, you may update the card you wish to play
+Choose a card value to play. 
+Until your opponent chooses their card for this round, you may update the card you wish to play
+
+After the round is resolved, both players draw a card from the shuffled deck
+
+Once the deck is empty, the player with the fewest cards wins.
+
+If your card is *lower* than our opponents, your card is discarded and theirs returns to their hand.
+
+If both cards are the same value, both are discarded
+
+Playing the Ace of Spades lets you discard any card while *also* discarding your opponent's card
+
+After playing the Ace, it moves to your opponent's hand
 
 + Parameters
     + game_id (required, number) - unique ID for the game
     + player_id (required, number) - your unique player ID
     + card (required, number) - the card value you wish to play (suits are ignored)
-     
+    + ace (optional, boolean) - whether you want to play the ace of spades
+    
 + Request (application/json)
     {
 
@@ -71,4 +88,4 @@ Once both players have chosen a card value, the server will resolve the round an
 player_id was invalid for the provided game_
 
 + Response 403 
-player_id did not have access to the provided card value
+player_id did not have the selected card
