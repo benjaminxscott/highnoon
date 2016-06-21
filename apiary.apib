@@ -40,7 +40,10 @@ Create a new game for two players
     { 
         "game_id": '42',
         "player_id" : '31337',
-        "hand" : [ {value: '2', suit:'diamonds']
+         "hand" : {
+            "player_id" : '31337' 
+            "cards": [ {value: '2', suit:'diamonds'}]
+            }
 
 ## Playing the Game [/play]
 
@@ -71,10 +74,11 @@ Get the current hand for a specified player and game
 player_id was invalid for the provided game_
 
 ### Play a Card [POST]
-Choose a card value to play. 
-Until your opponent chooses their card for this round, you may update your choice
+Choose a card value to play
 
-Playing the Ace of Spades lets you discard any card while *also* discarding your opponent's card
+This choice can be freely changed until both playeres have chosen their card for this round
+
+Choosing to play the Ace of Spades will discard any card value while *also* discarding the opponent's card(s)
 
 + Parameters
     + game_id (required, number) - unique ID for the game
@@ -91,10 +95,10 @@ Playing the Ace of Spades lets you discard any card while *also* discarding your
     }
 
 + Response 200 (application/json)
-Once both players have chosen a card value, the server will resolve the round and update each player's hand
+Once both players have chosen a card value, the server resolves the showdown and updates each player's hand
 
 + Response 401 
 player_id was invalid for the provided game_
 
 + Response 403 
-player_id did not have the selected card
+player_id does not have the selected card
