@@ -51,7 +51,13 @@ Create a new game for two players
 Make a move or check the current game state
 
 ### Show your Hand [GET]
-Get the current hand for a specified player and game
+Get game status, your current hand and current card choice 
+
+Possible values of `status`:
+- `ready` = you may choose a card for the next round (`choice` will be None in this case)
+- `waiting` = opponent has not chosen a card yet
+- `showdown` = server is processing the results of the last round
+- `ended` = game is over
 
 + Parameters
     + game_id (required, number) - unique ID for the game
@@ -60,7 +66,9 @@ Get the current hand for a specified player and game
 + Response 200 (application/json)
 
         { 
-            "game_id": '42',
+            "game_id": "42",
+            "status" : "waiting"
+            "choice" : "2"
             "hand" : {
                 "player_id" : '31337' 
                 "cards": [ {value: '2', suit:'diamonds'}]
@@ -107,6 +115,10 @@ Choosing to play the Ace of Spades will discard any card value while *also* disc
 + Response 401 (text/plain)
 
         player_id was invalid for the provided game_
+
++ Response 402 (text/plain)
+
+        showdown is in progress, please wait until game `status` is `ready`
 
 + Response 403 (text/plain)
 
