@@ -9,7 +9,7 @@ Start each player with starts with 5 cards from a shuffled deck
 ## The Choice
 Each round, players choose a single card value to play (i.e. "all my 9's" or "three of my 4's")
 
-> You may play choose to play multiple cards with the same value with no repercussions
+> You may play choose to play multiple cards with the same value with no advantage or downside (discarding all of them)
 
 ## The Showdown
 
@@ -27,9 +27,31 @@ After the showdown, both players draw a card from the shuffled deck
 
 > Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
-## Starting a New Game [/new/{player_id}{?rival_id}]
+## Create a new Player [/user/{?player_name}]
+ 
+Join and become a player
 
-Create a new game for two players
++ Parameters
+    + player_name (optional, string)
+
+### Create a new player [GET]
+
++ Response 200 (application/json)
+        
+        {
+            "player_id": '31337',
+            "player_name" :'Roland'
+        }
+
++ Response 400 (text/plain)
+
+        player_name was not valid (perhaps it contained illegal characters)
+        
+    
+    
+## Starting a New Game [/game/{player_id}{?rival_id}]
+
+Challenge another player
 
 + Parameters
     + player_id (required, number) - unique ID for player creating the game
@@ -45,6 +67,10 @@ Create a new game for two players
                 "player_id" : '31337' 
                 "cards": [ {value: '2', suit:'diamonds'}]
         }
+
++ Response 400 (text/plain)
+
+        specified player_id not found
 
 ## Playing the Game [/play/{game_id}{?player_id,card,ace}]
 
