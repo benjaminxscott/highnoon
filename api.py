@@ -11,12 +11,17 @@ from models import StringMessage, NewGameForm, GameForm, MakeMoveForm,\
     ScoreForms
 from utils import get_by_urlsafe, generate_player_id
 
+# DBG import bleach
+# DBG from profanity import contains_profanity
+
 NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
 GET_GAME_REQUEST = endpoints.ResourceContainer(
         urlsafe_game_key=messages.StringField(1),)
 MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
     MakeMoveForm,
     urlsafe_game_key=messages.StringField(1),)
+
+# TODO - how to change user_name to desired_name - ran into crazy 500 keyerrors
 USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1))
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
@@ -28,25 +33,30 @@ class AceofBlades(remote.Service):
                       response_message=StringMessage,
                       path='user',
                       name='create_user',
-                      http_method='GET')
+                      http_method='POST')
     def create_user(self, request):
         """Create a User. Optionally set a (non)unique username"""
         
-        if User.query(User.name == request.user_name).get():
+        '''
+        if contains_profanity(request.user_name)
             raise endpoints.BadRequestException(
-                    'TODO check for bad chars')
-                    
+                    'player_name was not valid - perhaps it contained profanity')
+        '''
+        
+        # TODO - why is user_name being ignored and not parsed?            
         player_name = None
-        if request.user_name:
+        if request.user_name is not None:
+            # DBG player_name = str(bleach.clean(request.user_name))
             player_name = request.user_name
             
-       #DBG  use generate_player_id() instead
-        user = User(player_id = '31337', player_name=player_name)
+        player_id = generate_player_id()
+        
+        user = User(player_id = player_id, player_name=player_name)
         user.put()
         
         # TODO return id and name as json instead
-        return StringMessage(message='Player {} has stepped through the door'.format(
-                player_name))
+        return StringMessage(message='Player {} with ID {} has stepped through the door'.format(
+                player_name, player_id))
 
     @endpoints.method(request_message=NEW_GAME_REQUEST,
                       response_message=GameForm,

@@ -10,7 +10,7 @@ from google.appengine.ext import ndb
 
 class User(ndb.Model):
     """User profile"""
-    # ASK - should playerid be KeyProperty?
+    # TODO - should playerid be KeyProperty?
     player_id = ndb.StringProperty(required=True)
     player_name =ndb.StringProperty()
 
