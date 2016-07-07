@@ -156,4 +156,4 @@ class AceofBlades(remote.Service):
                          'The average moves remaining is {:.2f}'.format(average))
 
 
-api = endpoints.api_server([GuessANumberApi])
+api = endpoints.api_server([AceofBlades])

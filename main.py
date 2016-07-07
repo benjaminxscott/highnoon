@@ -6,7 +6,7 @@ import logging
 
 import webapp2
 from google.appengine.api import mail, app_identity
-from api import GuessANumberApi
+from api import AceofBlades
 
 from models import User
 
@@ -14,7 +14,7 @@ from models import User
 class UpdateAverageMovesRemaining(webapp2.RequestHandler):
     def post(self):
         """Update game listing announcement in memcache."""
-        GuessANumberApi._cache_average_attempts()
+        AceofBlades._cache_average_attempts()
         self.response.set_status(204)
 
 
