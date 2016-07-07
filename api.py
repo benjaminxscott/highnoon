@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-`
-"""api.py - Create and configure the Game API exposing the resources.
-This can also contain game logic. For more complex games it would be wise to
-move game logic to another file. Ideally the API will be simple, concerned
-primarily with communication to/from the API's users."""
-
 
 import logging
 import endpoints
@@ -14,7 +9,7 @@ from google.appengine.api import taskqueue
 from models import User, Game, Score
 from models import StringMessage, NewGameForm, GameForm, MakeMoveForm,\
     ScoreForms
-from utils import get_by_urlsafe
+from utils import get_by_urlsafe, generate_player_id
 
 NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
 GET_GAME_REQUEST = endpoints.ResourceContainer(
@@ -22,28 +17,36 @@ GET_GAME_REQUEST = endpoints.ResourceContainer(
 MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
     MakeMoveForm,
     urlsafe_game_key=messages.StringField(1),)
-USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1),
-                                           email=messages.StringField(2))
+USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1))
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
-@endpoints.api(name='guess_a_number', version='v1')
-class GuessANumberApi(remote.Service):
+@endpoints.api(name='aceofblades', version='alpha-1')
+class AceofBlades(remote.Service):
     """Game API"""
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=StringMessage,
                       path='user',
                       name='create_user',
-                      http_method='POST')
+                      http_method='GET')
     def create_user(self, request):
-        """Create a User. Requires a unique username"""
+        """Create a User. Optionally set a (non)unique username"""
+        
         if User.query(User.name == request.user_name).get():
-            raise endpoints.ConflictException(
-                    'A User with that name already exists!')
-        user = User(name=request.user_name, email=request.email)
+            raise endpoints.BadRequestException(
+                    'TODO check for bad chars')
+                    
+        player_name = None
+        if request.user_name:
+            player_name = request.user_name
+            
+       #DBG  use generate_player_id() instead
+        user = User(player_id = '31337', player_name=player_name)
         user.put()
-        return StringMessage(message='User {} created!'.format(
-                request.user_name))
+        
+        # TODO return id and name as json instead
+        return StringMessage(message='Player {} has stepped through the door'.format(
+                player_name))
 
     @endpoints.method(request_message=NEW_GAME_REQUEST,
                       response_message=GameForm,

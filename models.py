@@ -10,8 +10,9 @@ from google.appengine.ext import ndb
 
 class User(ndb.Model):
     """User profile"""
-    name = ndb.StringProperty(required=True)
-    email =ndb.StringProperty()
+    # ASK - should playerid be KeyProperty?
+    player_id = ndb.StringProperty(required=True)
+    player_name =ndb.StringProperty()
 
 
 class Game(ndb.Model):

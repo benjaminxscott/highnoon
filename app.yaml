@@ -5,11 +5,13 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+# TODO - add endpoint handlers for defined functions 
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /_ah/spi/.*
+# ASK - do we have to setup endpoints here?  i.e /game
+- url: /.*
   script: api.api
 
 - url: /tasks/cache_average_attempts
