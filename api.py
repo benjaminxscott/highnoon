@@ -21,7 +21,7 @@ USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1))
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
-@endpoints.api(name='aceofblades', version='alpha-1')
+@endpoints.api(name='aceofblades', version='v1')
 class AceofBlades(remote.Service):
     """Game API"""
     @endpoints.method(request_message=USER_REQUEST,

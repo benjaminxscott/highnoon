@@ -11,7 +11,8 @@ handlers:
   upload: favicon\.ico
 
 # ASK - do we have to setup endpoints here?  i.e /game
-- url: /.*
+# or can we set /.* to handle all endpoints as defined in app.py
+- url: /_ah/spi/.*
   script: api.api
 
 - url: /tasks/cache_average_attempts
