@@ -27,14 +27,17 @@ After the showdown, both players draw a card from the shuffled deck
 
 > Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
-## Create a new Player [/user/{?player_name}]
+## Create a new Player [/user/]
  
 Join and become a player
 
-+ Parameters
-    + player_name (optional, string)
-
 ### Create a new player [POST]
+
++ Request (application/json)
+
+        {
+            "desired_name":"Roland"
+        }
 
 + Response 200 (application/json)
         
