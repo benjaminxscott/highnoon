@@ -1,5 +1,5 @@
-FORMAT:alpha-1
-HOST: https://aceofblades-dev.appspot.com
+FORMAT:v1
+HOST: https://aceofblades-dev.appspot.com/_ah/api/aceofblades/v1
 
 # Ace of Blades
 Take a regular deck and remove all face cards, leave only the ace of spades and numbered cards (37 total)
@@ -27,14 +27,17 @@ After the showdown, both players draw a card from the shuffled deck
 
 > Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
-## Create a new Player [/user/{?player_name}]
+## Create a new Player [/user/]
  
 Join and become a player
 
-+ Parameters
-    + player_name (optional, string)
+### Create a new player [POST]
 
-### Create a new player [GET]
++ Request (application/json)
+
+        {
+            "user_name":"Roland"
+        }
 
 + Response 200 (application/json)
         
@@ -45,7 +48,7 @@ Join and become a player
 
 + Response 400 (text/plain)
 
-        player_name was not valid (perhaps it contained illegal characters)
+        player_name was not valid (perhaps it contained profanity)
         
     
     
