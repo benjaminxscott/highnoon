@@ -7,6 +7,8 @@ from datetime import date
 from protorpc import messages
 from google.appengine.ext import ndb
 
+class UserMessage(messages.Message):
+    desiredname = messages.StringField(1)
 
 class User(ndb.Model):
     """User profile"""

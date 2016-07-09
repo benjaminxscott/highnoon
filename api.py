@@ -6,7 +6,7 @@ from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
-from models import User, Game, Score
+from models import User, Game, Score, UserMessage
 from models import StringMessage, NewGameForm, GameForm, MakeMoveForm,\
     ScoreForms
 from utils import get_by_urlsafe, generate_player_id
@@ -22,7 +22,7 @@ MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
     urlsafe_game_key=messages.StringField(1),)
 
 # TODO - how to change user_name to desired_name - ran into crazy 500 keyerrors
-USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1))
+USER_REQUEST = endpoints.ResourceContainer(UserMessage)
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
@@ -45,9 +45,9 @@ class AceofBlades(remote.Service):
         
         # TODO - why is user_name being ignored and not parsed?            
         player_name = None
-        if request.user_name is not None:
-            # DBG player_name = str(bleach.clean(request.user_name))
-            player_name = request.user_name
+        if request.desiredname is not None:
+            # DBG player_name = str(bleach.clean(request.desiredname))
+            player_name = request.desiredname
             
         player_id = generate_player_id()
         
@@ -56,7 +56,7 @@ class AceofBlades(remote.Service):
         
         # TODO return id and name as json instead
         return StringMessage(message='Player {} with ID {} has stepped through the door'.format(
-                player_name, player_id))
+                request.desiredname, player_id))
 
     @endpoints.method(request_message=NEW_GAME_REQUEST,
                       response_message=GameForm,
