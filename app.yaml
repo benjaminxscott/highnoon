@@ -6,19 +6,10 @@ threadsafe: yes
 
 handlers:
 # TODO - add endpoint handlers for defined functions 
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
-
 # ASK - can we redefine this to a different baseurl? i.e. /
 - url: /_ah/spi/.*
   script: api.api
 
-- url: /tasks/cache_average_attempts
-  script: main.app
-
-- url: /crons/send_reminder
-  script: main.app
 
 libraries:
 - name: webapp2
