@@ -2,8 +2,8 @@
 
 A card-game knife-fight with [two players and one winner](http://docs.aceofblades.apiary.io/)
 
-> “Shall there be truth between us? 
-> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
+## How to Play
+Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/#reference/0/starting-a-new-game) using your preferred client
 
 
 ## Build instructions
@@ -28,6 +28,6 @@ A card-game knife-fight with [two players and one winner](http://docs.aceofblade
 > note: account credentials will be saved by default to `~/.appcfg_oauth2_tokens` - delete this file to be re-prompted to login as a different account
 3. (optional) View and test endpoints at `$appname-appspot.com/_ah/api/explorer` 
 
-## How to Play
-Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/#reference/0/starting-a-new-game) using your preferred client
 
+> “Shall there be truth between us? 
+> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
