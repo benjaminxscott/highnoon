@@ -7,13 +7,38 @@ from datetime import date
 from protorpc import messages
 from google.appengine.ext import ndb
 
-class UserMessage(messages.Message):
+# --- Request parameters ---
+class PlayerMessage(messages.Message):
+    """Used to create a new player"""
     desired_name = messages.StringField(1)
+    
+class GameMessage(messages.Message):
+    """Used to create a new game"""
+    player_id = messages.StringField(1, required=True)
+    rival_id = messages.StringField(2)
 
-class User(ndb.Model):
+# --- Data Model ---
+class Player(ndb.Model):
     """User profile"""
     player_id = ndb.StringProperty(required=True)
     player_name =ndb.StringProperty()
+
+class Game(ndb.Model):
+    """Game object"""
+    # TODO - generate game ID
+    game_id = ndb.StringProperty(required=True)
+    slinger = ndb.KeyProperty(required=True, kind='Player')
+    rival = ndb.KeyProperty(required=True, kind='Player')
+    status = ndb.StringProperty(required=True, default="waiting")
+
+    @classmethod
+
+    def end_game(self, winner):
+        # TODO called at end of hand processing logic
+        # TODO - set winner ID
+        self.status = "done"
+        self.put()
+        return True
 
 
 class StringMessage(messages.Message):

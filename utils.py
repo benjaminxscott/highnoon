@@ -6,11 +6,12 @@ import endpoints
 import uuid
 import base64
 
-def generate_player_id():
+def uniq_id():
     # generate a urlsafe and copy/pastable uid
     # ref http://stackoverflow.com/a/10984286
     r_uuid = base64.urlsafe_b64encode(uuid.uuid4().bytes)
-    return r_uuid.replace('=', '')
+    r_uuid = r_uuid.translate(None, '_=-')
+    return r_uuid
 
 def get_by_urlsafe(urlsafe, model):
     """Returns an ndb.Model entity that the urlsafe key points to. Checks
