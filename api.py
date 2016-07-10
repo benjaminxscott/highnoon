@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-`
 
+# TODO - set rival in '/game'
+# TODO - build data structure for card deck
+# TODO - implement logic for choosing and manipulating hand
+
+# LATER - handle if opponent is none, can set later by hitting /game/challenge/rival_id
+# LATER - send notification if rival_id is set
+
+# LATER - sanitize user input using bleach and profanityfilter
+
 import logging
 import endpoints
 from protorpc import remote, messages
@@ -10,9 +19,6 @@ from models import Player, PlayerMessage, Game, GameMessage
 from models import StringMessage
 from utils import get_by_urlsafe, uniq_id
 
-import bleach
-from profanity import contains_profanity
-
 USER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
 GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1, required=True ) )
@@ -22,19 +28,14 @@ class AceofBlades(remote.Service):
     """Game API"""
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=StringMessage,
-                      path='user',
-                      name='create_user',
+                      path='player/new',
+                      name='create_player',
                       http_method='POST' )
-    def create_user(self, request):
+    def create_player(self, request):
         """Create a Player. Optionally set a (non)unique username"""
-        
-        if contains_profanity(request.desired_name):
-            raise endpoints.BadRequestException(
-                    'player_name was not valid - perhaps it contained profanity')
         
         player_name = None
         if request.desired_name is not None:
-            # DBG player_name = str(bleach.clean(request.desired_name))
             player_name = request.desired_name
             
         player_id = uniq_id()
@@ -46,11 +47,9 @@ class AceofBlades(remote.Service):
         return StringMessage(message='Player {} with ID {} has stepped through the door'.format(
                 player_name, player_id))
 
-# TODO /new game which finds use given player id and sets response to player in game object
-
     @endpoints.method(request_message=GAME_REQUEST,
                       response_message=StringMessage,
-                      path='game',
+                      path='game/new',
                       name='create_game',
                       http_method='POST' )
     def create_game(self, request):
@@ -59,15 +58,17 @@ class AceofBlades(remote.Service):
         # look up initiating player
         slinger = Player.query(Player.player_id == request.player_id).get()
         
+        if slinger is None:
+            raise endpoints.BadRequestException('specified player_id not found')
+            
         # generate new game 
         game_id = uniq_id()
-        game = Game(game_id = game_id, slinger = slinger.key)
+        game = Game(game_id = game_id, slinger = slinger.key, status = "waiting")
+        game.put()
         
         return StringMessage(message='Game with ID {} for player ID {} and player name {} '.format(
                 game_id, slinger.player_id, slinger.player_name))
                 
-    # TODO - handle if opponent is none, can set later by hitting /game/challenge/rival_id
-    # TODO - send notification if rival_id is set
     
     @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
                       response_message=StringMessage,
@@ -81,11 +82,11 @@ class AceofBlades(remote.Service):
         
         game = Game.query(Game.game_id == request.game_id).get()
         # note that primary key for Game is `game.key`
-        if game:
-            return StringMessage(message='Game with ID {} '.format(game.game_id))
-        
-        else:
+        if game is None:
             raise endpoints.BadRequestException('specified game_id not found')
+            
+            
+        return StringMessage(message='Game with ID {} '.format(game.game_id))
                 
 # --- RUN ---
 api = endpoints.api_server([AceofBlades])
