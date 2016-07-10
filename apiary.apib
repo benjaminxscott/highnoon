@@ -27,16 +27,16 @@ After the showdown, both players draw a card from the shuffled deck
 
 > Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
  
-## Create a new Player [/user/]
+## Create a new Player [/player/new]
  
-Join and become a player
+Join the battle, optionally picking a name
 
 ### Create a new player [POST]
 
 + Request (application/json)
 
         {
-            "user_name":"Roland"
+            "desired_name":"Roland"
         }
 
 + Response 200 (application/json)
@@ -52,15 +52,22 @@ Join and become a player
         
     
     
-## Starting a New Game [/game/{player_id}{?rival_id}]
+## Start a New Game [/game/new]
 
-Challenge another player
+Start a fight, optionally challenge an opponent
+> If no opponent is defined, they may be challenged later by visiting your game URL
 
-+ Parameters
-    + player_id (required, number) - unique ID for player creating the game
-    + rival_id (optional, number) - unique ID for opponent player to challenge
 
-### Start a new game [GET]
+
+### Start a new game [POST]
+
++ Request (application/json)
+
+        {
+            "player_id":"31337",
+            "rival_id": "8989"
+        }
+
 + Response 200 (application/json)
 
         { 
@@ -75,7 +82,33 @@ Challenge another player
 
         specified player_id not found
 
-## Playing the Game [/play/{game_id}{?player_id,card,ace}]
+## Get the status of a Game [/game/{game_id}]
+
+### Get game status [GET]
+
+Get information about the state of a game
+
+
++ Parameters
+    + game_id (required, number) - unique ID for the game
+
+
++ Response 200 (application/json)
+
+        { 
+            "game_id": '42',
+            "player_id" : '31337',
+             "hand" : {
+                "player_id" : '31337' 
+                "cards": [ {value: '2', suit:'diamonds'}]
+        }
+
++ Response 400 (text/plain)
+
+        specified game_id not found
+
+
+## Play the Game [/play/{game_id}{?player_id,card,ace}]
 
 Make a move or check the current game state
 
