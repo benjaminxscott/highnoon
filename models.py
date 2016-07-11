@@ -25,10 +25,9 @@ class Player(ndb.Model):
 
 class Game(ndb.Model):
     """Game object"""
-    # TODO - generate game ID
     game_id = ndb.StringProperty(required=True)
     slinger = ndb.KeyProperty(required=True, kind='Player')
-    rival = ndb.KeyProperty(required=True, kind='Player')
+    rival = ndb.KeyProperty(kind='Player', default=None)
     status = ndb.StringProperty(required=True, default="waiting")
 
     @classmethod

@@ -3,7 +3,7 @@
 A card-game knife-fight with [two players and one winner](http://docs.aceofblades.apiary.io/)
 
 ## How to Play
-Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/#reference/0/starting-a-new-game) using your preferred client
+Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/#reference/0/start-a-new-game/start-a-new-game?console=1) using your preferred client
 
 
 ## Build instructions
