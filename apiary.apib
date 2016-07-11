@@ -52,7 +52,7 @@ Join the battle, optionally picking a name
         
     
     
-## Start a New Game [/game/new]
+## Starting a Game [/game/new]
 
 Start a fight, optionally challenge an opponent
 > If no opponent is defined, they may be challenged later by visiting your game URL
@@ -82,9 +82,9 @@ Start a fight, optionally challenge an opponent
 
         specified player_id not found
 
-## Get the status of a Game [/game/{game_id}]
+## Getting information about a Game [/game/status/{game_id}]
 
-### Get game status [GET]
+### Get game status by ID [GET]
 
 Get information about the state of a game
 
@@ -108,7 +108,37 @@ Get information about the state of a game
         specified game_id not found
 
 
-## Play the Game [/play/{game_id}{?player_id}]
+## Cancelling a Game [/game/cancel/{game_id}]
+
+### Cancel a Game by ID [GET]
+
+Remove a game that's in progress
+
+> completed games cannot be removed
+
+
++ Parameters
+    + game_id (required, number) - unique ID for the game
+
+
++ Response 200 (application/json)
+
+        { 
+            "game_id": '42',
+            "winner_id": 'None',
+            "winner_name": 'None'
+        }
+
++ Response 400 (text/plain)
+
+        specified game_id not found
+
++ Response 403 (text/plain)
+
+        that game is finished and cannot be modified
+
+
+## Playing the Game [/game/play/{game_id}{?player_id}]
 
 Make a move or check the current game state
 
@@ -142,9 +172,9 @@ Possible values of `status`:
 
         player_id was invalid for the provided game
         
-+ Response 402 (text/plain)
++ Response 403 (text/plain)
 
-        This game has ended
+        that game is finished and cannot be modified
 
 ### Play a Card [POST]
 Choose a card value to play from your hand
