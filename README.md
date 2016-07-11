@@ -1,9 +1,12 @@
-# aceofblades
+# highnoon
 
-A card-game knife-fight with [two players and one winner](http://docs.aceofblades.apiary.io/)
+Simulates the typical Overwatch experience [playing against McCree](http://docs.highnoon.apiary.io/)
 
 ## How to Play
-Make queries to [public API endpoints](http://docs.aceofblades.apiary.io/#reference/0/start-a-new-game/start-a-new-game?console=1) using your preferred client
+
+Battle with a cunningly simulated McCree AI using [public API endpoints](http://docs.highnoon.apiary.io/#reference/0/start-a-new-game/start-a-new-game?console=1) using your preferred client
+
+> Watch out for his signature ultie
 
 
 ## Build instructions

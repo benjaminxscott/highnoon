@@ -18,17 +18,14 @@ class PlayerMessage(messages.Message):
     player_name = messages.StringField(3)
     
 class GameMessage(messages.Message):
-    """Used to create a new game"""
+    """Used to create and get information on games"""
     player_id = messages.StringField(1, required=True)
-    rival_id = messages.StringField(2, required=True)
-    game_id = messages.StringField(3)
-
-class GameOverMessage(messages.Message):
-    """Used to create a new game"""
-    game_id = messages.StringField(1)
-    winner_id = messages.StringField(2)
-    winner_name = messages.StringField(3)
+    game_id = messages.StringField(2)
+    won = messages.BooleanField(3)
     
+    action = messages.StringField (4)
+    health = messages.IntegerField (5)
+
 # --- Data Model ---
 class Player(ndb.Model):
     """User profile"""
@@ -38,51 +35,29 @@ class Player(ndb.Model):
     def to_message(self):
         return PlayerMessage(player_id=self.player_id, player_name= self.player_name)
        
-       
-class Hand(ndb.Model):
-    # TODO implement
-    
-    cards = ndb.JsonProperty(required = True)
-    has_ace = ndb.BooleanProperty(required = True, default=False)
-    
 class Game(ndb.Model):
     """Game object"""
     game_id = ndb.StringProperty(required=True)
-    
     slinger = ndb.KeyProperty(required=True, kind='Player')
+    won = ndb.BooleanProperty(default=None)
     
-    # TODO - later make rival optional and visit URL to challenge them
-    rival = ndb.KeyProperty(required=True,kind='Player', default=None)
+    health = ndb.IntegerProperty (default = 200)
+    action = ndb.StringProperty (default = None)
     
-    winner = ndb.KeyProperty(kind='Player', default=None)
+    highnoon = ndb.IntegerProperty (default = 0)
     
     def to_message(self):
         return GameMessage(
               game_id = self.game_id, 
-              player_id = Player.query(Player.key == self.slinger).get().player_id ,
-              rival_id = Player.query(Player.key == self.rival).get().player_id 
+              player_id = Player.query(Player.key == self.slinger).get().player_id,
+              won = self.won,
+              action = self.action,
+              health = self.health
               )
              
-    def end_game(self, winner):
-        # winner is a Player object
-        self.winner = winner
+    def end_game(self, has_won):
+        # False if AI wins, True otherwise
+        self.won = has_won
         self.put()
         
-        # if game was canceled before ending
-        if self.winner is None:
-            return GameOverMessage(
-                game_id = self.game_id,
-                winner_id = None,
-                winner_name = None
-                )
-            
-        else:
-            return GameOverMessage(
-                game_id = self.game_id,
-                winner_id = Player.query(Player.key == self.winner).get().player_id ,
-                winner_name = Player.query(Player.key == self.winner).get().player_name ,
-                )
-
-class StringMessage(messages.Message):
-    """StringMessage-- outbound (single) string message"""
-    message = messages.StringField(1, required=True)
+        return self.to_message()

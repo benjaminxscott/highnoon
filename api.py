@@ -1,24 +1,16 @@
 # -*- coding: utf-8 -*-`
 
-# LATER - update apiary with docs
-
-# LATER - build data structure for card deck using random.shuffle()
-# LATER - implement logic in /play for choosing and manipulating hand
-
-# LATER - handle if opponent is none, can set later by hitting /game/challenge/rival_id
-# LATER - send notification if rival_id is set
-
-# LATER - sanitize user input using bleach and profanityfilter
 
 import logging
 import endpoints
+import random
 from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
-from models import Player, PlayerMessage, Game, GameMessage,GameOverMessage
-from models import StringMessage
+from models import Player, PlayerMessage, Game, GameMessage,GameMessage
 from utils import get_by_urlsafe, uniq_id
+
 
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
@@ -29,7 +21,7 @@ GAME_PLAY_REQUEST = endpoints.ResourceContainer(
             player_id=messages.StringField(2, required=True )
             )
 
-@endpoints.api(name='aceofblades', version='v1')
+@endpoints.api(name='highnoon', version='v1')
 class AceofBlades(remote.Service):
     """Game API"""
     @endpoints.method(request_message=PLAYER_REQUEST,
@@ -39,6 +31,8 @@ class AceofBlades(remote.Service):
                       http_method='POST' )
     def create_player(self, request):
         """Create a Player. Optionally set a (non)unique username"""
+        
+        # LATER: include funny response when popular slinger names are chosen
         
         player_name = None
         if request.desired_name is not None:
@@ -65,17 +59,9 @@ class AceofBlades(remote.Service):
         if slinger is None:
             raise endpoints.BadRequestException('specified player_id not found')
             
-        # look up rival, if provided
-        if request.rival_id is None:
-            rival = None
-        else:
-            rival = Player.query(Player.player_id == request.rival_id).get()
-            if rival is None:
-                raise endpoints.BadRequestException('specified rival_id not found')
-                
         # generate new game 
         game_id = uniq_id()
-        game = Game(game_id = game_id, slinger = slinger.key, rival = rival.key)
+        game = Game(game_id = game_id, slinger = slinger.key)
         game.put()
         
         return game.to_message()
@@ -96,11 +82,10 @@ class AceofBlades(remote.Service):
         if game is None:
             raise endpoints.BadRequestException('specified game_id not found')
             
-            
         return game.to_message()
         
     @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
-                      response_message=GameOverMessage,
+                      response_message=GameMessage,
                       path='game/cancel/{game_id}',
                       name='cancel_game',
                       http_method='GET' )
@@ -113,20 +98,18 @@ class AceofBlades(remote.Service):
         if game is None:
             raise endpoints.BadRequestException('specified game_id not found')
         
-        if game.winner is not None:
+        if game.won is not None:
             raise endpoints.ForbiddenException('that game is finished and cannot be modified')
             
         game.key.delete()
         
-        return game.end_game(winner = None)
+        return game.to_message()
         
     @endpoints.method(request_message=GAME_PLAY_REQUEST,
-                      response_message=GameOverMessage,
-                      path='game/play/{game_id}/{player_id}',
+                      response_message=GameMessage,
+                      path='game/play',
                       name='play_game',
-                      http_method='GET' )
-                      
-  # TODO - implement with post (put?)
+                      http_method='POST' )
                       
     def play_game(self, request):
         """Choose an action in the current game"""
@@ -135,27 +118,58 @@ class AceofBlades(remote.Service):
         if game is None:
             raise endpoints.BadRequestException('specified game_id not found')
             
-        if game.winner is not None:
+        # handle if game status is finished
+        if game.won is not None:
             raise endpoints.ForbiddenException('that game is finished and cannot be modified')
             
-        # check if player exists
+        # check if player exists and is valid for this game
         contender = Player.query(Player.player_id == request.player_id).get()
         
         if contender is None:
             raise endpoints.BadRequestException('specified player_id not found')
             
-        # check if player is valid for this game
-        if game.slinger == contender.key or game.rival == contender.key:
-            winner = contender.key
-        
-        else:
+        elif game.slinger is not contender.key:
             raise endpoints.UnauthorizedException('specified player_id not valid for this game')
+            
         
-        return game.end_game(winner)
+        # --- game logic ---
         
+        # roll a random action for mcree
+        actions = ['retreat','pursue','showdown']
+        botChoice = random.choice(actions)
+        action = request.action
+        
+        if botChoice is "pursue" and action is "retreat" \
+            or botChoice is "showdown" and action is "pursue" \
+            or botChoice is "retreat" and action is "showdown":
+                # increment high noon ultimate meter
+                game.highnoon = game.highnoon + 35
+        
+        if action is "pursue" and botChoice is "retreat" \
+            or action is "showdown" and botChoice is "pursue" \
+            or action is "retreat" and botChoice is "showdown":
+                # roll for damage
+                game.health = game.health - random.randint(20,50)
+                game.put()
+            
+        # check if mccree is dead
+        if game.health <= 0: 
+            game.end_game(has_won = True)
+        
+        # TODO - roll to see if high noon procs
+        if game.highnoon >= 100 :
+            if game.randint(0, fun_quotient):
+                # ITS HIGH NOON.gif
+                game.end_game(has_won = False)
+            else:
+                fun_quotient = fun_quotient - 3 # make the game even more fun by increasing the odds of insta-death
+                game.highnoon = 0
+                game.put()
+            
+        return game.to_message()
                 
 # TODO - implement from boilerplate: get_high_scores / get_user_rankings / get_game_history
-# TODO - add email cronjob
+# TODO - add email cronjob with stupid meme
 
 # --- RUN ---
 api = endpoints.api_server([AceofBlades])
