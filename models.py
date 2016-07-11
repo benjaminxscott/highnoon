@@ -20,11 +20,12 @@ class PlayerMessage(messages.Message):
 class GameMessage(messages.Message):
     """Used to create and get information on games"""
     player_id = messages.StringField(1, required=True)
-    game_id = messages.StringField(2)
-    won = messages.BooleanField(3)
+    player_name = messages.StringField(2)
+    game_id = messages.StringField(3)
+    won = messages.BooleanField(4)
     
-    action = messages.StringField (4)
-    health = messages.IntegerField (5)
+    action = messages.StringField (5)
+    health = messages.IntegerField (6)
 
 # --- Data Model ---
 class Player(ndb.Model):
@@ -42,6 +43,7 @@ class Game(ndb.Model):
     won = ndb.BooleanProperty(default=None)
     
     health = ndb.IntegerProperty (default = 200)
+    fun_quotient = ndb.IntegerProperty (default = 12)
     action = ndb.StringProperty (default = None)
     
     highnoon = ndb.IntegerProperty (default = 0)
@@ -50,6 +52,7 @@ class Game(ndb.Model):
         return GameMessage(
               game_id = self.game_id, 
               player_id = Player.query(Player.key == self.slinger).get().player_id,
+              player_name = Player.query(Player.key == self.slinger).get().player_name,
               won = self.won,
               action = self.action,
               health = self.health

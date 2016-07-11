@@ -19,6 +19,7 @@ GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1
 GAME_PLAY_REQUEST = endpoints.ResourceContainer(
             game_id=messages.StringField(1, required=True ),
             player_id=messages.StringField(2, required=True )
+            action=messages.StringField(3, required=True )
             )
 
 @endpoints.api(name='highnoon', version='v1')
@@ -120,7 +121,7 @@ class AceofBlades(remote.Service):
             
         # handle if game status is finished
         if game.won is not None:
-            raise endpoints.ForbiddenException('that game is finished and cannot be modified')
+            raise endpoints.ForbiddenException('that game is finished')
             
         # check if player exists and is valid for this game
         contender = Player.query(Player.player_id == request.player_id).get()
@@ -133,17 +134,33 @@ class AceofBlades(remote.Service):
             
         
         # --- game logic ---
+        hints = [
+            "McCree stares with accusing blue eyes, baring your soul",
+            "McCree asks if Lady Luck has visited recently, flexing his gun hand",
+            "McCree holds his cap against the blazing sun, checking his watch",
+            "McCree chews on a piece of unidentified jerky, smirking through a ghastly grin",
+            "McCree reloads his revolver with a flick of the wrist, preparing to send you to the clearing at the end of the path"
+            ]
+        hint = random.choice (hints)
         
         # roll a random action for mcree
+            
         actions = ['retreat','pursue','showdown']
         botChoice = random.choice(actions)
-        action = request.action
+        
+        if request.action in actions:
+            action = request.action
+        else:
+            raise endpoints.BadRequestException('that action is not a possible choice')
         
         if botChoice is "pursue" and action is "retreat" \
             or botChoice is "showdown" and action is "pursue" \
             or botChoice is "retreat" and action is "showdown":
-                # increment high noon ultimate meter
+                # increment ultie meter
                 game.highnoon = game.highnoon + 35
+                if game.highnoon >= 70:
+                    hint = random.choice (hints)
+                game.put()
         
         if action is "pursue" and botChoice is "retreat" \
             or action is "showdown" and botChoice is "pursue" \
@@ -156,17 +173,18 @@ class AceofBlades(remote.Service):
         if game.health <= 0: 
             game.end_game(has_won = True)
         
-        # TODO - roll to see if high noon procs
+        # roll to see if high noon procs
         if game.highnoon >= 100 :
-            if game.randint(0, fun_quotient):
+            if game.randint(0, fun_quotient) == 0: # 1/12 chance for first time, then 1/9 until guaranteed at fifth time
                 # ITS HIGH NOON.gif
                 game.end_game(has_won = False)
             else:
-                fun_quotient = fun_quotient - 3 # make the game even more fun by increasing the odds of insta-death
+                game.fun_quotient = game.fun_quotient - 3 # make the game even more fun by increasing the odds of insta-death
+                # reset ultie meter
                 game.highnoon = 0
                 game.put()
             
-        return game.to_message()
+        return game.to_message(hint = hint)
                 
 # TODO - implement from boilerplate: get_high_scores / get_user_rankings / get_game_history
 # TODO - add email cronjob with stupid meme
