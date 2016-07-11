@@ -27,6 +27,14 @@ class GameMessage(messages.Message):
     action = messages.StringField (5)
     health = messages.IntegerField (6)
 
+class GameLookupMessage(messages.Message):
+    game_id=messages.StringField(1, required=True ) 
+    
+class GamePlayMessage(messages.Message):
+    game_id=messages.StringField(1, required=True )
+    player_id=messages.StringField(2, required=True )
+    action=messages.StringField(3, required=True )
+    
 # --- Data Model ---
 class Player(ndb.Model):
     """User profile"""

@@ -8,19 +8,14 @@ from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
-from models import Player, PlayerMessage, Game, GameMessage,GameMessage
+from models import Player, Game
+from models import PlayerMessage, GameMessage, GameLookupMessage, GamePlayMessage
 from utils import get_by_urlsafe, uniq_id
-
 
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
-GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1, required=True ) )
-
-GAME_PLAY_REQUEST = endpoints.ResourceContainer(
-            game_id=messages.StringField(1, required=True ),
-            player_id=messages.StringField(2, required=True )
-            action=messages.StringField(3, required=True )
-            )
+GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(GameLookupMessage)
+GAME_PLAY_REQUEST = endpoints.ResourceContainer(GamePlayMessage)
 
 @endpoints.api(name='highnoon', version='v1')
 class AceofBlades(remote.Service):
