@@ -37,7 +37,7 @@ class Game(ndb.Model):
     """Game object"""
     game_id = ndb.StringProperty(required=True)
     slinger = ndb.KeyProperty(required=True, kind='Player')
-    status = ndb.StringProperty(required=True, default="waiting")
+    status = ndb.StringProperty(required=True, default="ready")
     rival = ndb.KeyProperty(kind='Player', default=None)
     
     def to_message(self):
