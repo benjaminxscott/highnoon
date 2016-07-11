@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-`
 
-# TODO - set rival in '/game'
 # TODO - build data structure for card deck using random.shuffle()
 # TODO - implement logic in /play for choosing and manipulating hand
 
@@ -15,13 +14,18 @@ from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
-from models import Player, PlayerMessage, Game, GameMessage
+from models import Player, PlayerMessage, Game, GameMessage,GameOverMessage
 from models import StringMessage
 from utils import get_by_urlsafe, uniq_id
 
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
 GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1, required=True ) )
+
+GAME_PLAY_REQUEST = endpoints.ResourceContainer(
+            game_id=messages.StringField(1, required=True ),
+            player_id=messages.StringField(2, required=True )
+            )
 
 @endpoints.api(name='aceofblades', version='v1')
 class AceofBlades(remote.Service):
@@ -59,9 +63,17 @@ class AceofBlades(remote.Service):
         if slinger is None:
             raise endpoints.BadRequestException('specified player_id not found')
             
+        # look up rival, if provided
+        if request.rival_id is None:
+            rival = None
+        else:
+            rival = Player.query(Player.player_id == request.rival_id).get()
+            if rival is None:
+                raise endpoints.BadRequestException('specified rival_id not found')
+                
         # generate new game 
         game_id = uniq_id()
-        game = Game(game_id = game_id, slinger = slinger.key)
+        game = Game(game_id = game_id, slinger = slinger.key, rival = rival.key)
         game.put()
         
         return game.to_message()
@@ -77,12 +89,43 @@ class AceofBlades(remote.Service):
         """Get info about current game"""
         
         game = Game.query(Game.game_id == request.game_id).get()
-        # note that primary key for Game is `game.key`
         if game is None:
             raise endpoints.BadRequestException('specified game_id not found')
             
             
         return game.to_message()
+        
+    @endpoints.method(request_message=GAME_PLAY_REQUEST,
+                      response_message=GameOverMessage,
+                      path='play/{game_id}/{player_id}',
+                      name='play_game',
+                      http_method='GET' )
+                      
+    def play_game(self, request):
+        """Choose an action in the current game"""
+        
+        game = Game.query(Game.game_id == request.game_id).get()
+        if game is None:
+            raise endpoints.BadRequestException('specified game_id not found')
+            
+        if game.winner is not None:
+            raise endpoints.BadRequestException('that game is over')
+            
+        # check if player exists
+        contender = Player.query(Player.player_id == request.player_id).get()
+        
+        if contender is None:
+            raise endpoints.BadRequestException('specified player_id not found')
+            
+        # check if player is valid for this game
+        if game.slinger == contender.key or game.rival == contender.key:
+            winner = contender.key
+        
+        else:
+            raise endpoints.UnauthorizedException('specified player_id not valid for this game')
+        
+        return game.end_game(winner)
+        
                 
 # --- RUN ---
 api = endpoints.api_server([AceofBlades])

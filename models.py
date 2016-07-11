@@ -20,10 +20,15 @@ class PlayerMessage(messages.Message):
 class GameMessage(messages.Message):
     """Used to create a new game"""
     player_id = messages.StringField(1, required=True)
-    rival_id = messages.StringField(2)
+    rival_id = messages.StringField(2, required=True)
     game_id = messages.StringField(3)
-    status = messages.StringField(4)
 
+class GameOverMessage(messages.Message):
+    """Used to create a new game"""
+    game_id = messages.StringField(1)
+    winner_id = messages.StringField(2)
+    winner_name = messages.StringField(3)
+    
 # --- Data Model ---
 class Player(ndb.Model):
     """User profile"""
@@ -33,30 +38,40 @@ class Player(ndb.Model):
     def to_message(self):
         return PlayerMessage(player_id=self.player_id, player_name= self.player_name)
        
+       
+class Hand(ndb.Model):
+    # TODO implement
+    
+    cards = ndb.JsonProperty(required = True)
+    has_ace = ndb.BooleanProperty(required = True, default=False)
+    
 class Game(ndb.Model):
     """Game object"""
     game_id = ndb.StringProperty(required=True)
+    
     slinger = ndb.KeyProperty(required=True, kind='Player')
-    status = ndb.StringProperty(required=True, default="ready")
-    rival = ndb.KeyProperty(kind='Player', default=None)
+    
+    # TODO - later make rival optional and visit URL to challenge them
+    rival = ndb.KeyProperty(required=True,kind='Player', default=None)
+    
+    winner = ndb.KeyProperty(kind='Player', default=None)
     
     def to_message(self):
         return GameMessage(
-          game_id = self.game_id, 
-        # slinger is primary key into Player DB
-          player_id = Player.query(Player.key == self.slinger).get().player_id ,
-#TODO          rival_id = Player.query(Player.key == self.rival).get().player_id ,
-          status = self.status)
-
-    @classmethod
-
+              game_id = self.game_id, 
+              player_id = Player.query(Player.key == self.slinger).get().player_id ,
+              rival_id = Player.query(Player.key == self.rival).get().player_id 
+              )
+             
     def end_game(self, winner):
-        # TODO called at end of hand processing logic
-        # TODO - set winner ID
-        self.status = "done"
+        # winner is a Player object
+        self.winner = winner
         self.put()
-        return True
-
+        return GameOverMessage(
+                game_id = self.game_id,
+                winner_id = Player.query(Player.key == self.winner).get().player_id ,
+                winner_name = Player.query(Player.key == self.winner).get().player_name ,
+                )
 
 class StringMessage(messages.Message):
     """StringMessage-- outbound (single) string message"""
