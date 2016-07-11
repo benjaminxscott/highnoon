@@ -1,35 +1,43 @@
 FORMAT:v1
-HOST: https://aceofblades-dev.appspot.com/_ah/api/aceofblades/v1
+HOST: https://highnoon-dev.appspot.com/_ah/api/highnoon/v1
 
-# Ace of Blades
-Take a regular deck and remove all face cards, leave only the ace of spades and numbered cards (37 total)
+# How to Play
 
-Start each player with starts with 5 cards from a shuffled deck
+> Win by eliminating McCree before he defeats you
+
+- Create a Player account and join a Game
+
+- Choose to `pursue`, `retreat` or `showdown` in each round against McCree
+
+- McCree will make his own choice and compare it against yours
+
+- After each round McCree takes damage or gains progress towards High Noon
+
+> McCree starts with 200 health and takes between `20 to 70` damage per successful attack
 
 ## The Choice
-Each round, players choose a single card value to play (i.e. "all my 9's" or "three of my 4's")
 
-> You may play choose to play multiple cards with the same value with no advantage or downside (discarding all of them)
+Each choice is strong against one of McCree's choices:
 
-## The Showdown
+- Pursuing while he Retreats
+- Retreating while he is in Showdown
+- Showdown while he Pursues
 
-Card values are compared and judged:
-- Discard all cards of the lowest value
-- If all cards are the same value, they are all discarded
-- If the Ace of Spades was played, all cards are discarded
+If both you and McCree make the same choice, the round ends in a stalemate
 
-If either player has the Ace of Spades, they may play it and choose any card value to discard
+## High Noon
 
-> After playing the Ace, it transfers to the opposing player
+Each round, McCree will gain an amount of progress towards triggering his ultimate. 
 
-## The Aftermath
-After the showdown, both players draw a card from the shuffled deck
+> If McCree chooses a strong choice against you, he gains more progress. ability - `High Noon`
 
-> Win by discarding your entire hand, or having the fewest cards when the draw pile is empty
- 
+When High Noon is used, is has a chance of instantly defeating you
+
+> End it fast! A longer match will make the odds of losing to High Noon more likely
+
 ## Create a new Player [/player/new]
  
-Join the battle, optionally picking a name
+Join the battle, optionally choosing a name
 
 ### Create a new player [POST]
 
@@ -54,10 +62,7 @@ Join the battle, optionally picking a name
     
 ## Starting a Game [/game/new]
 
-Start a fight, optionally challenge an opponent
-> If no opponent is defined, they may be challenged later by visiting your game URL
-
-
+Create a new match, 1 vs 1 with our favorite gunslinger
 
 ### Start a new game [POST]
 
