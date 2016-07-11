@@ -108,7 +108,7 @@ Get information about the state of a game
         specified game_id not found
 
 
-## Play the Game [/play/{game_id}{?player_id,card,ace}]
+## Play the Game [/play/{game_id}{?player_id}]
 
 Make a move or check the current game state
 
@@ -153,13 +153,6 @@ Choose a card value to play from your hand
 
 Choosing to play the Ace of Spades will discard any card value while *also* discarding the opponent's card(s)
 
-
-+ Parameters
-    + game_id (required, number) - unique ID for the game
-    + player_id (required, number) - your unique player ID
-    + card (required, number) - the card value you wish to play
-    + ace (optional, boolean) - whether you want to play the ace of spades
-    
 + Request (application/json)
 
         {
