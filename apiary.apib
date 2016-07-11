@@ -7,13 +7,13 @@ HOST: https://highnoon-dev.appspot.com/_ah/api/highnoon/v1
 
 - Create a Player account and join a Game
 
-- Choose to `pursue`, `retreat` or `showdown` in each round against McCree
+- Choose an action: `pursue`, `retreat` or `showdown` in each round against McCree
 
-- McCree will make his own choice and compare it against yours
+- McCree takes his action *after* yours
 
-- After each round McCree takes damage or gains progress towards High Noon
+- Based on your choices, McCree will take damage or gain progress towards High Noon
 
-> McCree starts with 200 health and takes between `20 to 70` damage per successful attack
+> McCree starts with 200 health and takes between `20 to 50` damage per successful attack
 
 ## The Choice
 
@@ -27,13 +27,15 @@ If both you and McCree make the same choice, the round ends in a stalemate
 
 ## High Noon
 
-Each round, McCree will gain an amount of progress towards triggering his ultimate. 
+Each round, McCree will gain an amount of progress towards triggering his ultimate ability `High Noon`
 
-> If McCree chooses a strong choice against you, he gains more progress. ability - `High Noon`
+> If McCree chooses a strong choice against you, he gains more progress
 
 When High Noon is used, is has a chance of instantly defeating you
 
-> End it fast! A longer match will make the odds of losing to High Noon more likely
+> In later rounds the odds of losing to High Noon become more likely
+
+Since McCree takes his action after yours, you can defeat him at the last second if his health is low and you damage him before he's able to trigger `High Noon`
 
 ## Create a new Player [/player/new]
  
@@ -69,18 +71,15 @@ Create a new match, 1 vs 1 with our favorite gunslinger
 + Request (application/json)
 
         {
-            "player_id":"31337",
-            "rival_id": "8989"
+            "player_id":"31337"
         }
 
 + Response 200 (application/json)
 
         { 
-            "game_id": '42',
-            "player_id" : '31337',
-             "hand" : {
-                "player_id" : '31337' 
-                "cards": [ {value: '2', suit:'diamonds'}]
+            "game_id": "42",
+            "player_id" : "31337"
+
         }
 
 + Response 400 (text/plain)
@@ -102,10 +101,7 @@ Get information about the state of a game
 
         { 
             "game_id": '42',
-            "player_id" : '31337',
-             "hand" : {
-                "player_id" : '31337' 
-                "cards": [ {value: '2', suit:'diamonds'}]
+            "player_id" : '31337'
         }
 
 + Response 400 (text/plain)
@@ -130,8 +126,7 @@ Remove a game that's in progress
 
         { 
             "game_id": '42',
-            "winner_id": 'None',
-            "winner_name": 'None'
+            "player_id" : '31337'
         }
 
 + Response 400 (text/plain)
@@ -143,73 +138,60 @@ Remove a game that's in progress
         that game is finished and cannot be modified
 
 
-## Playing the Game [/game/play/{game_id}{?player_id}]
+## Playing the Game [/game/play]
 
-Make a move or check the current game state
+Make a move against McCree
 
-### Look at your Hand [GET]
-Get game status, your current hand and current card choice 
 
-Possible values of `status`:
-- `ready` = you may choose a card for the next round 
-- `waiting` = opponent has not chosen a card yet
-- `showdown` = server is processing the results of the last round
-- `ended` = game is over
+### Choose an Action [POST]
 
-+ Parameters
-    + game_id (required, number) - unique ID for the game
-    + player_id (required, number) - player ID requesting 
-     
-+ Response 200 (application/json)
+Choose an action: `pursue`, `retreat` or `showdown` 
 
-        { 
-            "game_id": "42",
-            "status" : "waiting"
-            "choice" : "2"
-            "hand" : {
-                "player_id" : '31337' 
-                "cards": [ {value: '2', suit:'diamonds'}]
-                }
-            
-        }  
-    
-+ Response 401 (text/plain)
+McCree will then choose an action and respond with his updated health total and his action
 
-        player_id was invalid for the provided game
-        
-+ Response 403 (text/plain)
+Each choice is strong against one of McCree's choices:
 
-        that game is finished and cannot be modified
+- Pursuing while he Retreats
+- Retreating while he is in Showdown
+- Showdown while he Pursues
 
-### Play a Card [POST]
-Choose a card value to play from your hand
+If both you and McCree make the same choice, the round ends in a stalemate
 
-> This choice can be freely changed until both players have chosen their card for this round
-
-Choosing to play the Ace of Spades will discard any card value while *also* discarding the opponent's card(s)
 
 + Request (application/json)
 
         {
         
-            "game_id": '42',
-            "player_id": '31337',
-            "card": '7',
-            "ace": 'True'
+            "game_id": "42",
+            "player_id": "31337",
+            "action":"pursue"
         }
 
 + Response 200 (application/json)
 
-        Once both players have chosen a card value, the server resolves the showdown and updates each player's hand
+        {
+            "game_id": "42",
+            "player_id": "31337",
+            "health": "100",
+            "action": "retreat"
+        }
+
++ Response 400 (text/plain)
+
+        that action is not a possible choice
+
++ Response 400 (text/plain)
+
+        specified game_id not found
+        
++ Response 400 (text/plain)
+
+        specified player_id not found
 
 + Response 401 (text/plain)
 
-        player_id was invalid for the provided game_
-
-+ Response 402 (text/plain)
-
-        showdown is in progress, please wait until game `status` is `ready`
-
+        specified player_id not valid for this game
+        
 + Response 403 (text/plain)
 
-        player_id does not have the selected card
+        that game is finished
