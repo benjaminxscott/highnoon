@@ -67,7 +67,17 @@ class Game(ndb.Model):
         # winner is a Player object
         self.winner = winner
         self.put()
-        return GameOverMessage(
+        
+        # if game was canceled before ending
+        if self.winner is None:
+            return GameOverMessage(
+                game_id = self.game_id,
+                winner_id = None,
+                winner_name = None
+                )
+            
+        else:
+            return GameOverMessage(
                 game_id = self.game_id,
                 winner_id = Player.query(Player.key == self.winner).get().player_id ,
                 winner_name = Player.query(Player.key == self.winner).get().player_name ,

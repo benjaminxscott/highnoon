@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-`
 
-# TODO - build data structure for card deck using random.shuffle()
-# TODO - implement logic in /play for choosing and manipulating hand
+# LATER - update apiary with docs
+
+# LATER - build data structure for card deck using random.shuffle()
+# LATER - implement logic in /play for choosing and manipulating hand
 
 # LATER - handle if opponent is none, can set later by hitting /game/challenge/rival_id
 # LATER - send notification if rival_id is set
@@ -81,10 +83,12 @@ class AceofBlades(remote.Service):
     
     @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
                       response_message=GameMessage,
-                      path='game/{game_id}',
+                      path='game/status/{game_id}',
                       name='read_game',
                       http_method='GET' )
                       
+# TODO - implement get_user_games with query in games/user/{player_id}
+
     def read_game(self, request):
         """Get info about current game"""
         
@@ -95,11 +99,34 @@ class AceofBlades(remote.Service):
             
         return game.to_message()
         
+    @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
+                      response_message=GameOverMessage,
+                      path='game/cancel/{game_id}',
+                      name='cancel_game',
+                      http_method='GET' )
+    
+    def cancel_game(self, request):
+        """Remove an active game"""
+        
+        game = Game.query(Game.game_id == request.game_id).get()
+        
+        if game is None:
+            raise endpoints.BadRequestException('specified game_id not found')
+        
+        if game.winner is not None:
+            raise endpoints.ForbiddenException('that game is finished and cannot be modified')
+            
+        game.key.delete()
+        
+        return game.end_game(winner = None)
+        
     @endpoints.method(request_message=GAME_PLAY_REQUEST,
                       response_message=GameOverMessage,
-                      path='play/{game_id}/{player_id}',
+                      path='game/play/{game_id}/{player_id}',
                       name='play_game',
                       http_method='GET' )
+                      
+  # TODO - implement with post (put?)
                       
     def play_game(self, request):
         """Choose an action in the current game"""
@@ -109,7 +136,7 @@ class AceofBlades(remote.Service):
             raise endpoints.BadRequestException('specified game_id not found')
             
         if game.winner is not None:
-            raise endpoints.BadRequestException('that game is over')
+            raise endpoints.ForbiddenException('that game is finished and cannot be modified')
             
         # check if player exists
         contender = Player.query(Player.player_id == request.player_id).get()
@@ -127,5 +154,8 @@ class AceofBlades(remote.Service):
         return game.end_game(winner)
         
                 
+# TODO - implement from boilerplate: get_high_scores / get_user_rankings / get_game_history
+# TODO - add email cronjob
+
 # --- RUN ---
 api = endpoints.api_server([AceofBlades])
