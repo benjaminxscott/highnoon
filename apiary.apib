@@ -13,7 +13,7 @@ HOST: https://highnoon-dev.appspot.com/_ah/api/highnoon/v1
 
 - Based on your choices, McCree will take damage or gain progress towards High Noon
 
-> McCree starts with 200 health and takes between `20 to 50` damage per successful attack
+> McCree starts with 200 health and takes between `20 to 30` damage per successful attack
 
 ## The Choice
 
@@ -125,8 +125,7 @@ Remove a game that's in progress
 + Response 200 (application/json)
 
         { 
-            "game_id": '42',
-            "player_id" : '31337'
+            "game_id": '42'
         }
 
 + Response 400 (text/plain)
@@ -147,6 +146,8 @@ Make a move against McCree
 
 Choose an action: `pursue`, `retreat` or `showdown` 
 
+> If `won` is returned True, you won! (The inverse... not so much)
+
 McCree will then choose an action and respond with his updated health total and his action
 
 Each choice is strong against one of McCree's choices:
@@ -157,6 +158,7 @@ Each choice is strong against one of McCree's choices:
 
 If both you and McCree make the same choice, the round ends in a stalemate
 
+> You may wish to combine the `watch` with `-n 3` along with `curl` to simulate a running battle
 
 + Request (application/json)
 
@@ -174,6 +176,7 @@ If both you and McCree make the same choice, the round ends in a stalemate
             "player_id": "31337",
             "health": "100",
             "action": "retreat"
+            "won" : "True"
         }
 
 + Response 400 (text/plain)
