@@ -147,6 +147,8 @@ Make a move against McCree
 
 Choose an action: `pursue`, `retreat` or `showdown` 
 
+> If `won` is returned True, you won! (The inverse... not so much)
+
 McCree will then choose an action and respond with his updated health total and his action
 
 Each choice is strong against one of McCree's choices:
@@ -175,6 +177,7 @@ If both you and McCree make the same choice, the round ends in a stalemate
             "player_id": "31337",
             "health": "100",
             "action": "retreat"
+            "won" : "True"
         }
 
 + Response 400 (text/plain)
