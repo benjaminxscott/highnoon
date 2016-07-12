@@ -1,12 +1,13 @@
 # highnoon
 
+> “Shall there be truth between us? 
+> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
+
 Simulates the typical Overwatch experience [playing against McCree](http://docs.highnoon.apiary.io/)
 
 ## How to Play
 
 Battle with a cunningly simulated McCree AI using [public API endpoints](http://docs.highnoon.apiary.io/#reference/0/start-a-new-game/start-a-new-game?console=1) using your preferred client
-
-> Watch out for his signature ultie
 
 
 ## Build instructions
@@ -31,6 +32,5 @@ Battle with a cunningly simulated McCree AI using [public API endpoints](http://
 > note: account credentials will be saved by default to `~/.appcfg_oauth2_tokens` - delete this file to be re-prompted to login as a different account
 3. (optional) View and test endpoints at `$appname-appspot.com/_ah/api/explorer` 
 
+![highnoon](http://img.ifcdn.com/images/8b3e2b0811fd853e566f1c06b54de1368dc8efb5faba84144f4839ed41e64cdc_1.jpg)
 
-> “Shall there be truth between us? 
-> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
