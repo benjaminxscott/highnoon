@@ -1,5 +1,6 @@
 
 import random
+import json
 from datetime import date
 from protorpc import messages
 from google.appengine.ext import ndb
@@ -28,6 +29,10 @@ class GameMessage(messages.Message):
 class GameListMessage(messages.Message):
     """ returns list of game IDs for a given player ID"""
     game_list = messages.StringField(1, repeated=True)
+    
+class GameHistoryMessage(messages.Message):
+    """ returns list of game IDs for a given player ID"""
+    history = messages.StringField(1)
 
 # --- Data Model ---
 class Player(ndb.Model):
@@ -38,15 +43,24 @@ class Player(ndb.Model):
     def to_message(self):
         return PlayerMessage(player_id=self.player_id, player_name= self.player_name)
        
+class History (ndb.Model):
+    game = ndb.KeyProperty(required=True)
+    history = ndb.JsonProperty(default = [])
+    
 class Game(ndb.Model):
     """Game object"""
     game_id = ndb.StringProperty(required=True)
     player_id = ndb.StringProperty(required=True)
     won = ndb.BooleanProperty(default=None)
     
+    round_count = ndb.IntegerProperty (default = 0)
     health = ndb.IntegerProperty (default = 200)
     fun_quotient = ndb.IntegerProperty (default = 9)
     highnoon = ndb.IntegerProperty (default = 0)
+    
+    def get_history(self):
+        moves = History.query(History.game == self.key).get()
+        return GameHistoryMessage(history = json.dumps(moves.history) )
     
     def to_message(self, hint=None, action=None):
         return GameMessage(
@@ -59,9 +73,3 @@ class Game(ndb.Model):
               action = action
               )
              
-    def end_game(self, has_won):
-        # False if AI wins, True otherwise
-        self.won = has_won
-        self.put()
-        
-        return self.to_message()

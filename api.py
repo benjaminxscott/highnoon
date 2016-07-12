@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-`
 
-
 import logging
 import endpoints
 from google.appengine.ext import ndb
@@ -9,7 +8,8 @@ from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
-from models import Player, PlayerMessage, Game, GameMessage,GameMessage, GameListMessage
+from models import Player,History, Game 
+from models import GameMessage, GameHistoryMessage, GameListMessage, PlayerMessage
 from utils import get_by_urlsafe, uniq_id
 
 
@@ -68,6 +68,10 @@ class HighNoon(remote.Service):
         game = Game(game_id = game_id, player_id = slinger.player_id)
         game.put()
         
+        # create game history for this game
+        history = History(game = game.key)
+        history.put()
+        
         return game.to_message()
                 
 
@@ -86,6 +90,22 @@ class HighNoon(remote.Service):
             raise endpoints.BadRequestException('specified game_id not found')
             
         return game.to_message()
+        
+    @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
+                      response_message=GameHistoryMessage,
+                      path='game/history/{game_id}',
+                      name='get_game_history',
+                      http_method='GET' )
+                      
+
+    def get_game_history(self, request):
+        """Get history for specified game"""
+        
+        game = Game.query(Game.game_id == request.game_id).get()
+        if game is None:
+            raise endpoints.BadRequestException('specified game_id not found')
+            
+        return game.get_history()
         
     @endpoints.method(request_message=PLAYER_LOOKUP_REQUEST,
                       response_message=GameListMessage,
@@ -177,6 +197,9 @@ class HighNoon(remote.Service):
         else:
             raise endpoints.BadRequestException('that action is not a possible choice')
         
+        # increment round counter
+        game.round_count = game.round_count + 1
+        
         if (botAction == "pursue" and action == "retreat") \
             or (botAction == "showdown" and action == "pursue") \
             or (botAction == "retreat" and action == "showdown"):
@@ -184,14 +207,12 @@ class HighNoon(remote.Service):
                 game.highnoon = game.highnoon + 35
                 if game.highnoon >= 70:
                     hint = random.choice (hints)
-                game.put()
         
         if (action == "pursue" and botAction == "retreat") \
             or (action == "showdown" and botAction == "pursue") \
             or (action == "retreat" and botAction == "showdown"):
                 # You won the round, roll for damage
                 game.health = game.health - random.randint(20,30)
-                game.put()
             
         else:
             # stalemate, which helps McCree a bit 
@@ -199,23 +220,40 @@ class HighNoon(remote.Service):
             
         # check if mccree is dead
         if game.health <= 0: 
-            game.end_game(has_won = True)
+            game.won = True
         
         # ultie meter is full - roll to see if high noon procs
         if game.highnoon >= 100 :
             if random.randint(0, game.fun_quotient) == 0: # 1/9 chance for first time, then 1/6 until guaranteed at fourth meter refill
                 hint = "ITS HIGH NOON - a red mist fills your eyes"
-                game.end_game(has_won = False)
+                game.won = False
             else:
                 # narrowly avoided certain demise
                 hint = "Luckily you're behind cover when you hear ITS HIGH NOON"
                 game.fun_quotient = game.fun_quotient - 3 # make the game even more fun by increasing the odds of insta-death
                 # reset ultie meter
                 game.highnoon = 0
-                game.put()
             
+        moves = History.query(History.game == game.key).get()
+        
+        # build dict of round outcomes
+        action_dict = {
+            "player_action": action,
+            "ai_action": botAction,
+            "health": game.health,
+            "highnoon_meter": game.highnoon,
+            "fun_quotient": game.fun_quotient,
+            "won": game.won,
+            "round_count": game.round_count
+            
+        }
+        # append to history
+        moves.history.append(action_dict)
+        moves.put()
+        
+        game.put()
+        # if game.won == None, we continue - else it's over
         return game.to_message(hint = hint, action = botAction)
-                
-
+        
 # --- RUN ---
 api = endpoints.api_server([HighNoon])
