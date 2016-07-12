@@ -1,20 +1,30 @@
 # highnoon
 
-Simulates the typical Overwatch experience [playing against McCree](http://docs.highnoon.apiary.io/)
+Simulates the typical Overwatch experience - try to eliminate McCree before he takes out your entire team
 
 ## How to Play
 
-> Win by eliminating McCree before he defeats you
+> See the [endpoint documentation](http://docs.highnoon.apiary.io/) for details on request format and fields
 
-- Create a Player account and join a Game
+- Create a Player account with a POST to `/player/new`  which returns your `player_id`
+ 
+- Join a game with a POST to `/game/new` which returns a `game_id`
 
-- Choose an action: `pursue`, `retreat` or `showdown` in each round against McCree
+> Check the status of a game with a GET to `/game/status/$game_id`
 
-- McCree takes his action *after* yours
+> Check the status of a game with a GET to `/game/list/$player_id`
+
+- Start the game by taking an action with a POST to `/game/play`: `pursue`, `retreat` or `showdown` 
+
+> McCree takes his action *after* yours
 
 - Based on your choices, McCree will take damage or gain progress towards High Noon
 
 > McCree starts with 200 health and takes between `20 to 30` damage per successful attack
+
+- Keep choosing actions for each round until one of you lies in the dust
+
+> Keep an eye on the `hint` field in responses 
 
 ### The Choice
 
@@ -38,7 +48,7 @@ When High Noon is used, is has a chance of instantly defeating you
 
 Since McCree takes his action after yours, you can defeat him at the last second if his health is low and you damage him before he's able to trigger `High Noon`
 
-## Building the App
+## Building the app
 1. Download the [google-python sdk](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
 2. Install to your local librarie path `unzip -d /usr/local/lib/python2.7/dist-packages/google_appengine google_appengine.zip`
 3. Add library path to system path `export PATH=$PATH:/usr/local/lib/python2.7/dist-packages/google_appengine`
