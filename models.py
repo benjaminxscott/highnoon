@@ -1,6 +1,3 @@
-"""models.py - This file contains the class definitions for the Datastore
-entities used by the Game. Because these classes are also regular Python
-classes they can include methods (such as 'to_form' and 'new_game')."""
 
 import random
 from datetime import date
@@ -22,11 +19,11 @@ class GameMessage(messages.Message):
     player_id = messages.StringField(1 )
     player_name = messages.StringField(2)
     game_id = messages.StringField(3)
-    won = messages.BooleanField(4)
+    health = messages.IntegerField (4)
+    won = messages.BooleanField(5)
     
-    action = messages.StringField (5)
-    hint = messages.StringField (6)
-    health = messages.IntegerField (7)
+    action = messages.StringField (6)
+    hint = messages.StringField (7)
 
 class GameListMessage(messages.Message):
     """ returns list of game IDs for a given player ID"""
