@@ -13,6 +13,8 @@ from models import GameMessage, GameHistoryMessage, GameListMessage, PlayerMessa
 from utils import get_by_urlsafe, uniq_id
 
 
+# TODO - implement from boilerplate: get_high_scores / get_user_rankings 
+
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
 GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1, required=True ) )
