@@ -19,6 +19,7 @@ class PlayerMessage(messages.Message):
     email = messages.StringField(2)
     player_id = messages.StringField(3)
     player_name = messages.StringField(4)
+    wins = messages.IntegerField(5)
 
 
 class GameMessage(messages.Message):
@@ -39,8 +40,16 @@ class GameListMessage(messages.Message):
 
 
 class GameHistoryMessage(messages.Message):
-    """ returns list of game IDs for a given player ID"""
-    history = messages.StringField(1)
+    """ returns list of dictionaries for the actions on a given game ID """
+    # note that this is a string due to there not being a JsonField object defined in Messages class
+    # - this is OK since the field is returned as a json.dumps(), which ends up being a list of dictionaries that can be read with json.loads()
+    # ref https://cloud.google.com/appengine/docs/python/tools/protorpc/messages/fieldclasses
+    history = messages.StringField(1) 
+
+
+class LeaderboardMessage(messages.Message):
+    """ returns list of dictionaries for high scores of players """
+    player_scores = messages.StringField(1, repeated = True)
 
 # --- Data Model ---
 
@@ -51,10 +60,13 @@ class Player(ndb.Model):
     player_name = ndb.StringProperty(default=None)
     player_email = ndb.StringProperty(default=None)
     needs_taunted = ndb.BooleanProperty(default=False)
+    wins = ndb.IntegerProperty(default=0)
 
     def to_message(self):
         return PlayerMessage(player_id=self.player_id,
-                             player_name=self.player_name, email=self.player_email)
+                             player_name=self.player_name,
+                             email=self.player_email,
+                             wins=self.wins)
 
 
 class History (ndb.Model):

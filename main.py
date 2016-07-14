@@ -12,9 +12,11 @@ from models import Player
 
 
 class SendTauntEmail(webapp2.RequestHandler):
+    """ Send a snarky email to reinforce that the player has lost to McCree"""
 
     def get(self):
         # find all players who have set an email and have recently lost
+
         # LATER - add query index to allow searching for non-null emails
         # ref https://cloud.google.com/appengine/docs/python/ndb/queries
         losers = Player.query(Player.needs_taunted == True

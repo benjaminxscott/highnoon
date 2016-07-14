@@ -7,12 +7,11 @@ import random
 from protorpc import remote, messages
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
+from protorpc import message_types
 
 from models import Player, History, Game
-from models import GameMessage, GameHistoryMessage, GameListMessage, PlayerMessage
+from models import GameMessage, GameHistoryMessage, GameListMessage, PlayerMessage, LeaderboardMessage
 from utils import uniq_id
-
-# TODO - implement from boilerplate: get_high_scores / get_user_rankings
 
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
@@ -120,7 +119,7 @@ class HighNoon(remote.Service):
     def get_user_games(self, request):
         """Get games in progress and completed games for a specified player"""
 
-        # check if player exists and is valid for this game
+        # check if player exists
         player = Player.query(Player.player_id == request.player_id).get()
 
         if player is None:
@@ -132,14 +131,59 @@ class HighNoon(remote.Service):
 
         # find in progress games for this user
         results = Game.query(Game.player_id == request.player_id)
-        for game in results:
-            if game.won is None:
-                inprogress_games.append(game.game_id)
-            else:
-                completed_games.append(game.game_id)
+
+        if results is not None:
+            for game in results:
+                if game.won is None:
+                    inprogress_games.append(game.game_id)
+                else:
+                    completed_games.append(game.game_id)
 
         return GameListMessage(
             completed_games=completed_games, inprogress_games=inprogress_games)
+
+# TODO - add score endpoints to apiary
+
+    @endpoints.method(request_message=message_types.VoidMessage,
+                      response_message=LeaderboardMessage,
+                      path='player/scores/',
+                      name='get_high_scores',
+                      http_method='GET')
+    def get_high_scores(self, request):
+        """Get a sorted list of players who have beaten McCree"""
+
+        player_scores = []
+        # filter ppl who have never won a game, to make it easier to read the leaderboard
+        # query returns sorted by number of wins
+
+        players = Player.query(Player.wins > 0).order(-Player.wins).get()
+
+        if players is not None:
+            for player in players:
+                player_dict = {
+                    "wins": player.wins,
+                    "player_id": player.player_id
+                }
+                player_scores.append(player_dict)
+
+        return LeaderboardMessage(player_scores=player_scores)
+
+    @endpoints.method(request_message=PLAYER_LOOKUP_REQUEST,
+                      response_message=PlayerMessage,
+                      path='player/score/{player_id}',
+                      name='get_user_rankings',
+                      http_method='GET')
+    def get_user_rankings(self, request):
+        """ Return the win count for a given player"""
+
+        # check if player exists
+        player = Player.query(Player.player_id == request.player_id).get()
+
+        if player is None:
+            raise endpoints.BadRequestException(
+                'specified player_id not found')
+
+        return player.to_message()
 
     @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
                       response_message=GameMessage,
@@ -234,6 +278,7 @@ class HighNoon(remote.Service):
 
         # check if mccree is dead
         if game.health <= 0:
+            contender.wins = contender.wins + 1
             game.won = True
 
         # ultie meter is full - roll to see if high noon procs
@@ -264,7 +309,6 @@ class HighNoon(remote.Service):
             "fun_quotient": game.fun_quotient,
             "won": game.won,
             "round_count": game.round_count
-
         }
 
         # append to history
