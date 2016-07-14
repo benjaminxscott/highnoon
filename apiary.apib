@@ -221,3 +221,40 @@ If both you and McCree make the same choice, the round ends in a stalemate
 + Response 403 (text/plain)
 
         that game is finished
+        
+## Checking the Leaderboard [/player/scores/]
+
+### See the top gunslingers [GET]
+
+See a sorted list of players who have defeated McCree the most times
+
+> Players with no McCree eliminations are filtered out for output cleanliness
+
++ Response 200 (application/json)
+
+        {
+            "player_scores":
+                [
+                    {
+                        "player_id":"31337",
+                        "wins":"19"
+                    },
+                    {
+                        "player_id":"8181",
+                        "wins":"13"
+                    }
+                ]
+        }
+
+## Checking your Score [/player/score/{player_id}]
+
+### See how many times you've bested McCree [GET]
+
+See how many times you've defeated McCree 
+
++ Response 200 (application/json)
+
+        {
+            "player_id": "31337",
+            "wins": "3"
+        }
