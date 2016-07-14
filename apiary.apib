@@ -113,12 +113,19 @@ Get information about the state of a game
 
 ### Get list of games by player ID [GET]
 
-Get all games in progress for a specified player
+Get games in progress and completed games for a specified player
 
 
 + Parameters
     + player_id (required, number) - unique ID for the player
 
+
++ Response 200 (application/json)
+
+        {
+            "inprogress_games":"[42]",
+            "completed_games":"[81]"
+        }
 
 + Response 400 (text/plain)
 
