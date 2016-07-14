@@ -25,9 +25,9 @@ PLAYER_LOOKUP_REQUEST = endpoints.ResourceContainer(player_id=messages.StringFie
 # - seems to be resolved if remove 'required' - are all fields req'd in a POST and required only matters for GET?
 
 GAME_PLAY_REQUEST = endpoints.ResourceContainer(
-            game_id=messages.StringField(1),
-            player_id=messages.StringField(2),
-            action=messages.StringField(3)
+            game_id=messages.StringField(1, required = True),
+            player_id=messages.StringField(2, required = True),
+            action=messages.StringField(3, required = True)
             )
 
 @endpoints.api(name='highnoon', version='v1')
@@ -177,7 +177,6 @@ class HighNoon(remote.Service):
         
         game = Game.query(Game.game_id == request.game_id).get()
         if game is None:
-            # TODO - DBG to return gameid
             raise endpoints.BadRequestException('specified game_id {} not found'.format(request.game_id))
             
         # handle if game status is finished
@@ -240,8 +239,9 @@ class HighNoon(remote.Service):
             game.won = True
         
         # ultie meter is full - roll to see if high noon procs
-        if game.highnoon >= 100 :
-            if random.randint(0, game.fun_quotient) == 0: # 1/9 chance for first time, then 1/6 until guaranteed at fourth meter refill
+        # DBG for testing
+        if True :#game.highnoon >= 100 :
+            if True: #random.randint(0, game.fun_quotient) == 0: # 1/9 chance for first time, then 1/6 until guaranteed at fourth meter refill
                 hint = "ITS HIGH NOON - a red mist fills your eyes"
                 contender.needs_taunted = True
                 game.won = False

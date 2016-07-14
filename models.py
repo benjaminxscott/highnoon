@@ -19,13 +19,12 @@ class PlayerMessage(messages.Message):
 class GameMessage(messages.Message):
     """Used to create and get information on games"""
     player_id = messages.StringField(1 )
-    player_name = messages.StringField(2)
-    game_id = messages.StringField(3)
-    health = messages.IntegerField (4)
-    won = messages.BooleanField(5)
+    game_id = messages.StringField(2)
+    health = messages.IntegerField (3)
+    won = messages.BooleanField(4)
     
-    action = messages.StringField (6)
-    hint = messages.StringField (7)
+    action = messages.StringField (5)
+    hint = messages.StringField (6)
 
 class GameListMessage(messages.Message):
     """ returns list of game IDs for a given player ID"""
@@ -70,7 +69,6 @@ class Game(ndb.Model):
         return GameMessage(
               game_id = self.game_id, 
               player_id = self.player_id,
-              player_name = Player.query(Player.player_id == self.player_id).get().player_name,
               won = self.won,
               health = self.health,
               hint = hint,

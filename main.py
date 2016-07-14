@@ -10,14 +10,17 @@ from api import HighNoon
 
 from models import Player
 
-# TODO test to make sure this works
 class SendTauntEmail(webapp2.RequestHandler):
     def get(self):
         # find all players who have set an email and have recently lost 
+        # LATER - add query index to allow searching for non-null emails - the syntax has some gotchas
         # ref https://cloud.google.com/appengine/docs/python/ndb/queries
-        losers = Player.query(Player.needs_taunted == True, Player.player_email != None)
+        losers = Player.query(Player.needs_taunted == True
         
         for loser in losers:
+            if loser.player_email is None:
+                continue
+            
             name = loser.player_name
             email = loser.email
             
@@ -38,16 +41,9 @@ class SendTauntEmail(webapp2.RequestHandler):
                            
             loser.needs_taunted = False
     
-
-# TODO - is this needed?
-class UpdateAverageMovesRemaining(webapp2.RequestHandler):
-    def post(self):
-        """Update game listing announcement in memcache."""
-        HighNoon._cache_average_attempts()
         self.response.set_status(204)
 
-
-app = webapp2.WSGIApplication([
-    ('/crons/send', SendTauntEmail),
-    ('/tasks/cache_average_attempts', UpdateAverageMovesRemaining),
-], debug=True)
+app = webapp2.WSGIApplication(
+    [
+        ('/crons/send', SendTauntEmail) 
+    ])
