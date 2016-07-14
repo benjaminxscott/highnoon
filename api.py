@@ -26,6 +26,7 @@ GAME_PLAY_REQUEST = endpoints.ResourceContainer(
     action=messages.StringField(3, required=True)
 )
 
+# TODO - add comments
 
 @endpoints.api(name='highnoon', version='v1')
 class HighNoon(remote.Service):
@@ -142,11 +143,9 @@ class HighNoon(remote.Service):
         return GameListMessage(
             completed_games=completed_games, inprogress_games=inprogress_games)
 
-# TODO - add score endpoints to apiary
-
     @endpoints.method(request_message=message_types.VoidMessage,
                       response_message=LeaderboardMessage,
-                      path='player/scores/',
+                      path='player/scores',
                       name='get_high_scores',
                       http_method='GET')
     def get_high_scores(self, request):

@@ -19,14 +19,14 @@ class SendTauntEmail(webapp2.RequestHandler):
 
         # LATER - add query index to allow searching for non-null emails
         # ref https://cloud.google.com/appengine/docs/python/ndb/queries
-        losers = Player.query(Player.needs_taunted == True
+        losers = Player.query(Player.needs_taunted == True)
 
         for loser in losers:
             if loser.player_email is None:
                 continue
 
             name=loser.player_name
-            email=loser.email
+            email=loser.player_email
 
             if name is None:
                 name=""
