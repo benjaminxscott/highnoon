@@ -50,7 +50,7 @@ Since McCree takes his action after yours, you can defeat him at the last second
 
 ## Building the app
 1. Download the [google-python sdk](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
-2. Install to your local librarie path `unzip -d /usr/local/lib/python2.7/dist-packages/google_appengine google_appengine.zip`
+2. Install to your local path `unzip -d /usr/local/lib/python2.7/dist-packages/google_appengine google_appengine.zip`
 3. Add library path to system path `export PATH=$PATH:/usr/local/lib/python2.7/dist-packages/google_appengine`
 4. (optional) add the previous command to your `~/.bashrc` to persist across logins
 
@@ -58,7 +58,7 @@ Since McCree takes his action after yours, you can defeat him at the last second
 ### Deploying the app locally
 
 1.  Run the app locally with `dev_appserver.py $app_folder`
-1.  Test by visiting the [API Explorer on your local box](https://localhost:8080/_ah/api/explorer`)
+1.  Test by visiting the [API Explorer on your local box](https://localhost:8080/_ah/api/explorer)
 2.  (optional) make `curl` requests to API endpoints at localhost
 
  
