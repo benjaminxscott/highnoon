@@ -6,35 +6,54 @@ import logging
 
 import webapp2
 from google.appengine.api import mail, app_identity
-from api import GuessANumberApi
+from google.appengine.ext import ndb
+from api import HighNoon
 
 from models import User
 
-class SendReminderEmail(webapp2.RequestHandler):
+# TODO test to make sure this works
+class SendTauntEmail(webapp2.RequestHandler):
     def get(self):
-        """Send a reminder email to each User with an email about games.
-        Called every hour using a cron job"""
-        app_id = app_identity.get_application_id()
-        users = User.query(User.email != None)
-        for user in users:
-            subject = 'This is a reminder!'
-            body = 'Hello {}, try out Guess A Number!'.format(user.name)
+        # find all players who have lost recently
+        # ref https://cloud.google.com/appengine/docs/python/ndb/queries
+        losers = Player.query(ndb.AND (Player.needs_taunted = True)
+            
+        for loser in losers:
+            # skip people with no email set
+            # LATER - could optimize by adjusting the query above - tried an AND expression and got 'can't have keyword in expression' error
+            if loser.player_email is None:
+                continue
+            
+            name = loser.player_name
+            email = loser.email
+            
+            if name is None:
+                name = ""
+                
+            subject = "Hello {} ".format(name)
+                
+            body = "It's HIGH NOON"
+            body = body + '<hr />'
+            body = body + '<img src = "http://img.ifcdn.com/images/8b3e2b0811fd853e566f1c06b54de1368dc8efb5faba84144f4839ed41e64cdc_1.jpg" alt="highnoon.gif" >'
             # This will send test emails, the arguments to send_mail are:
             # from, to, subject, body
-            mail.send_mail('noreply@{}.appspotmail.com'.format(app_id),
-                           user.email,
+            mail.send_mail('noreply@{}.appspotmail.com'.format(app_identity.get_application_id()),
+                           email,
                            subject,
                            body)
+                           
+            loser.needs_taunted = False
+    
 
-
+# TODO - is this needed?
 class UpdateAverageMovesRemaining(webapp2.RequestHandler):
     def post(self):
         """Update game listing announcement in memcache."""
-        GuessANumberApi._cache_average_attempts()
+        HighNoon._cache_average_attempts()
         self.response.set_status(204)
 
 
 app = webapp2.WSGIApplication([
-    ('/crons/send_reminder', SendReminderEmail),
+    ('/crons/send', SendTauntEmail),
     ('/tasks/cache_average_attempts', UpdateAverageMovesRemaining),
 ], debug=True)

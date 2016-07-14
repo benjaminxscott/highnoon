@@ -1,0 +1,4 @@
+cron:
+- description: Send a taunting email to batch of players who have lost (once per lost game)
+  url: /crons/send
+  schedule: every 1 minutes
