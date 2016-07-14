@@ -29,7 +29,8 @@ class GameMessage(messages.Message):
 
 class GameListMessage(messages.Message):
     """ returns list of game IDs for a given player ID"""
-    game_list = messages.StringField(1, repeated=True)
+    completed_games = messages.StringField(1, repeated=True)
+    inprogress_games = messages.StringField(2, repeated=True)
     
 class GameHistoryMessage(messages.Message):
     """ returns list of game IDs for a given player ID"""

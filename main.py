@@ -6,24 +6,18 @@ import logging
 
 import webapp2
 from google.appengine.api import mail, app_identity
-from google.appengine.ext import ndb
 from api import HighNoon
 
-from models import User
+from models import Player
 
 # TODO test to make sure this works
 class SendTauntEmail(webapp2.RequestHandler):
     def get(self):
-        # find all players who have lost recently
+        # find all players who have set an email and have recently lost 
         # ref https://cloud.google.com/appengine/docs/python/ndb/queries
-        losers = Player.query(ndb.AND (Player.needs_taunted = True)
-            
+        losers = Player.query(Player.needs_taunted == True, Player.player_email != None)
+        
         for loser in losers:
-            # skip people with no email set
-            # LATER - could optimize by adjusting the query above - tried an AND expression and got 'can't have keyword in expression' error
-            if loser.player_email is None:
-                continue
-            
             name = loser.player_name
             email = loser.email
             

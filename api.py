@@ -124,20 +124,26 @@ class HighNoon(remote.Service):
                       http_method='GET' )
     
     def get_user_games(self, request):
-        game_list = []
+        """Get games in progress and completed games for a specified player"""
+        
         # check if player exists and is valid for this game
         player = Player.query(Player.player_id == request.player_id).get()
         
         if player is None:
             raise endpoints.BadRequestException('specified player_id not found')
             
-        # find all games where player ID is listed
-        results = Game.query(Game.player_id == request.player_id)
+        inprogress_games = []
+        completed_games = []
         
+        # find in progress games for this user
+        results = Game.query(Game.player_id == request.player_id)
         for game in results:
-            game_list.append(game.game_id)
-    
-        return GameListMessage(game_list = game_list)
+            if game.won is None:
+                inprogress_games.append(game.game_id)
+            else:
+                completed_games.append(game.game_id)
+                
+        return GameListMessage(completed_games = completed_games, inprogress_games = inprogress_games)
         
     @endpoints.method(request_message=GAME_LOOKUP_REQUEST,
                       response_message=GameMessage,
@@ -215,7 +221,7 @@ class HighNoon(remote.Service):
             or (botAction == "showdown" and action == "pursue") \
             or (botAction == "retreat" and action == "showdown"):
                 # McCree won the round, increment ultie meter
-                game.highnoon = game.highnoon + 35
+                game.highnoon = game.highnoon + 25
                 if game.highnoon >= 70:
                     hint = random.choice (hints)
         
