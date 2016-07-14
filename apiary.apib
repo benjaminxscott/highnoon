@@ -39,14 +39,15 @@ Since McCree takes his action after yours, you can defeat him at the last second
 
 ## Create a new Player [/player/new]
  
-Join the battle, optionally choosing a name
+Join the battle, optionally choosing a name and setting your email
 
 ### Create a new player [POST]
 
 + Request (application/json)
 
         {
-            "desired_name":"Roland"
+            "desired_name":"Roland",
+            "email":"roland@tet.corp"
         }
 
 + Response 200 (application/json)
@@ -107,6 +108,22 @@ Get information about the state of a game
 + Response 400 (text/plain)
 
         specified game_id not found
+
+## Getting a list of Games for a given Player [/game/list/{player_id}]
+
+### Get list of games by player ID [GET]
+
+Get all games in progress for a specified player
+
+
++ Parameters
+    + player_id (required, number) - unique ID for the player
+
+
++ Response 400 (text/plain)
+
+        specified player_id not found
+
 
 
 ## Cancelling a Game [/game/cancel/{game_id}]
