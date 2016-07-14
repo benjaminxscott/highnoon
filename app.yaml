@@ -9,6 +9,9 @@ handlers:
 - url: /_ah/spi/.*
   script: api.api
 
+- url: /crons/send
+  script: main.app
+  
 libraries:
 - name: webapp2
   version: "2.5.2"

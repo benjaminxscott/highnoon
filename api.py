@@ -14,15 +14,18 @@ from utils import get_by_urlsafe, uniq_id
 
 
 # TODO - implement from boilerplate: get_high_scores / get_user_rankings 
+# TODO - pass pep8 formatting
 
 PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
 GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
 GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(game_id=messages.StringField(1, required=True ) )
 PLAYER_LOOKUP_REQUEST = endpoints.ResourceContainer(player_id=messages.StringField(1, required=True ) )
 
-# ASK : weird issue where getting 'parameter is required' in gcloud (works on dev_appserver) even when it's provided in post data, so removed 'required' flag which likely causes weird bugs
+# ASK : weird issue where getting 'parameter is required' in gcloud (works on dev_appserver) even when it's provided in post data
+# - seems to be resolved if remove 'required' - are all fields req'd in a POST and required only matters for GET?
+
 GAME_PLAY_REQUEST = endpoints.ResourceContainer(
-            game_id=messages.StringField(1, required = True),
+            game_id=messages.StringField(1),
             player_id=messages.StringField(2),
             action=messages.StringField(3)
             )
@@ -36,9 +39,14 @@ class HighNoon(remote.Service):
                       name='create_player',
                       http_method='POST' )
     def create_player(self, request):
-        """Create a Player. Optionally set a (non)unique username"""
+        """Create a Player. Optionally set a (non)unique username and email (not validated)"""
         
+        # LATER: filter using bleach and profanity pip libs to prevent XSS and xbox live community
         # LATER: include funny response when popular slinger names are chosen
+        
+        email = None
+        if request.email is not None:
+            email = request.email
         
         player_name = None
         if request.desired_name is not None:
@@ -46,7 +54,7 @@ class HighNoon(remote.Service):
             
         player_id = uniq_id()
         
-        player = Player(player_id = player_id, player_name=player_name)
+        player = Player(player_id = player_id, player_name=player_name, player_email = email)
         player.put()
         
         return player.to_message()
@@ -163,6 +171,7 @@ class HighNoon(remote.Service):
         
         game = Game.query(Game.game_id == request.game_id).get()
         if game is None:
+            # TODO - DBG to return gameid
             raise endpoints.BadRequestException('specified game_id {} not found'.format(request.game_id))
             
         # handle if game status is finished
@@ -228,6 +237,7 @@ class HighNoon(remote.Service):
         if game.highnoon >= 100 :
             if random.randint(0, game.fun_quotient) == 0: # 1/9 chance for first time, then 1/6 until guaranteed at fourth meter refill
                 hint = "ITS HIGH NOON - a red mist fills your eyes"
+                contender.needs_taunted = True
                 game.won = False
             else:
                 # narrowly avoided certain demise
@@ -249,12 +259,16 @@ class HighNoon(remote.Service):
             "round_count": game.round_count
             
         }
+        
         # append to history
         moves.history.append(action_dict)
         moves.put()
         
+        # save off changes
         game.put()
-        # if game.won == None, we continue - else it's over
+        contender.put()
+        
+        # round is over - the game is over if game.won has been set to anything but None
         return game.to_message(hint = hint, action = botAction)
         
 # --- RUN ---

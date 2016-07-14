@@ -12,8 +12,9 @@ from google.appengine.ext import ndb
 class PlayerMessage(messages.Message):
     """Used to create a new player"""
     desired_name = messages.StringField(1)
-    player_id = messages.StringField(2)
-    player_name = messages.StringField(3)
+    email = messages.StringField(2)
+    player_id = messages.StringField(3)
+    player_name = messages.StringField(4)
     
 class GameMessage(messages.Message):
     """Used to create and get information on games"""
@@ -38,10 +39,12 @@ class GameHistoryMessage(messages.Message):
 class Player(ndb.Model):
     """User profile"""
     player_id = ndb.StringProperty(required=True)
-    player_name =ndb.StringProperty()
+    player_name =ndb.StringProperty(default = None)
+    player_email = ndb.StringProperty(default = None)
+    needs_taunted = ndb.BooleanProperty(default = False)
     
     def to_message(self):
-        return PlayerMessage(player_id=self.player_id, player_name= self.player_name)
+        return PlayerMessage(player_id=self.player_id, player_name= self.player_name, email = self.player_email)
        
 class History (ndb.Model):
     game = ndb.KeyProperty(required=True)
