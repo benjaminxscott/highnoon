@@ -12,9 +12,9 @@ Simulates the typical Overwatch experience - try to eliminate McCree before he t
 
 > Check the status of a game with a GET to `/game/status/$game_id`
 
-> Check the status of a game with a GET to `/game/list/$player_id`
+> See all games for a given player with a GET to `/game/list/$player_id`
 
-- Start the game by taking an action with a POST to `/game/play`: `pursue`, `retreat` or `showdown` 
+- Start the game by taking an action with a request to `/game/play`: `pursue`, `retreat` or `showdown` 
 
 > McCree takes his action *after* yours
 
@@ -25,6 +25,10 @@ Simulates the typical Overwatch experience - try to eliminate McCree before he t
 - Keep choosing actions for each round until one of you lies in the dust
 
 > Keep an eye on the `hint` field in responses 
+
+- If you win, check the leaderboards to see how you compare with a GET to `/player/scores`
+
+> See the win count for a given player with a GET to `/player/score/$player_id`
 
 ### The Choice
 
