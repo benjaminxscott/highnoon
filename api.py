@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-`
 
 import logging
+import json
 import endpoints
 from google.appengine.ext import ndb
 import random
@@ -25,8 +26,6 @@ GAME_PLAY_REQUEST = endpoints.ResourceContainer(
     player_id=messages.StringField(2, required=True),
     action=messages.StringField(3, required=True)
 )
-
-# TODO - add comments
 
 @endpoints.api(name='highnoon', version='v1')
 class HighNoon(remote.Service):
@@ -155,7 +154,7 @@ class HighNoon(remote.Service):
         # filter ppl who have never won a game, to make it easier to read the leaderboard
         # query returns sorted by number of wins
 
-        players = Player.query(Player.wins > 0).order(-Player.wins).get()
+        players = Player.query(Player.wins > 0).order(-Player.wins).fetch(50)
 
         if players is not None:
             for player in players:
@@ -163,7 +162,7 @@ class HighNoon(remote.Service):
                     "wins": player.wins,
                     "player_id": player.player_id
                 }
-                player_scores.append(player_dict)
+                player_scores.append(json.dumps(player_dict))
 
         return LeaderboardMessage(player_scores=player_scores)
 

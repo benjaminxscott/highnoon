@@ -58,7 +58,7 @@ class Player(ndb.Model):
     player_name = ndb.StringProperty(default=None)
     player_email = ndb.StringProperty(default=None)
     needs_taunted = ndb.BooleanProperty(default=False)
-    wins = ndb.IntegerProperty(default=0)
+    wins = ndb.IntegerProperty(default=1) # TODO DBG
 
     def to_message(self):
         return PlayerMessage(player_id=self.player_id,
