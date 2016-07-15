@@ -188,7 +188,7 @@ class HighNoon(remote.Service):
                       response_message=GameMessage,
                       path='game/cancel/{game_id}',
                       name='cancel_game',
-                      http_method='GET')
+                      http_method='DELETE')
     def cancel_game(self, request):
         """Remove an active game"""
 
@@ -209,7 +209,7 @@ class HighNoon(remote.Service):
                       response_message=GameMessage,
                       path='game/play',
                       name='play_game',
-                      http_method='POST')
+                      http_method='PUT')
     def play_game(self, request):
         """Choose an action in the current game"""
 
