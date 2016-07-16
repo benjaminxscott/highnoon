@@ -145,9 +145,9 @@ class HighNoon(remote.Service):
     @endpoints.method(request_message=message_types.VoidMessage,
                       response_message=LeaderboardMessage,
                       path='player/scores',
-                      name='get_high_scores',
+                      name='get_user_rankings',
                       http_method='GET')
-    def get_high_scores(self, request):
+    def get_user_rankings(self, request):
         """Get a sorted list of players who have beaten McCree"""
 
         player_scores = []
@@ -169,9 +169,9 @@ class HighNoon(remote.Service):
     @endpoints.method(request_message=PLAYER_LOOKUP_REQUEST,
                       response_message=PlayerMessage,
                       path='player/score/{player_id}',
-                      name='get_user_rankings',
+                      name='get_user_score',
                       http_method='GET')
-    def get_user_rankings(self, request):
+    def get_user_score(self, request):
         """ Return the win count for a given player"""
 
         # check if player exists
