@@ -11,13 +11,21 @@ from google.appengine.api import taskqueue
 from protorpc import message_types
 
 from models import Player, History, Game
-from models import GameMessage, GameHistoryMessage, GameListMessage, PlayerMessage, LeaderboardMessage
+from models import GameMessage, PlayerMessage, GameHistoryMessage, GameListMessage, LeaderboardMessage
 from utils import uniq_id
 
-PLAYER_REQUEST = endpoints.ResourceContainer(PlayerMessage)
-GAME_REQUEST = endpoints.ResourceContainer(GameMessage)
+PLAYER_CREATE_REQUEST = endpoints.ResourceContainer(
+    desired_name = messages.StringField(1),
+    email = messages.StringField(2)
+    )
+
+GAME_CREATE_REQUEST = endpoints.ResourceContainer(
+    player_id = messages.StringField(1, required = True)
+    )
+    
 GAME_LOOKUP_REQUEST = endpoints.ResourceContainer(
     game_id=messages.StringField(1, required=True))
+    
 PLAYER_LOOKUP_REQUEST = endpoints.ResourceContainer(
     player_id=messages.StringField(1, required=True))
 
@@ -30,7 +38,7 @@ GAME_PLAY_REQUEST = endpoints.ResourceContainer(
 @endpoints.api(name='highnoon', version='v1')
 class HighNoon(remote.Service):
     """Game API"""
-    @endpoints.method(request_message=PLAYER_REQUEST,
+    @endpoints.method(request_message=PLAYER_CREATE_REQUEST,
                       response_message=PlayerMessage,
                       path='player/new',
                       name='create_player',
@@ -57,7 +65,7 @@ class HighNoon(remote.Service):
 
         return player.to_message()
 
-    @endpoints.method(request_message=GAME_REQUEST,
+    @endpoints.method(request_message=GAME_CREATE_REQUEST,
                       response_message=GameMessage,
                       path='game/new',
                       name='create_game',
