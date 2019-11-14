@@ -2,6 +2,9 @@
 
 Simulates the typical Overwatch experience - try to eliminate McCree before he takes out your entire team
 
+> “Shall there be truth between us? 
+> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
+
 ## How to Play
 
 > See the [endpoint documentation](http://docs.highnoon.apiary.io/) for details on request format and fields
@@ -74,6 +77,3 @@ Since McCree takes his action after yours, you can defeat him at the last second
 > note: include the `--noauth_local_webserver` flag to authenticate from a headless box
 > note: account credentials will be saved by default to `~/.appcfg_oauth2_tokens` - delete this file to be re-prompted to login as a different account
 3. (optional) View and test endpoints at `$appname-appspot.com/_ah/api/explorer` 
-
-> “Shall there be truth between us? 
-> Not as friends, but as enemies and equals?” ― Stephen King, The Gunslinger
